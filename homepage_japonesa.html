@@ -1,0 +1,3248 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark" />
+  <title>静かな一日 — Minha Página V5</title>
+  <style>
+    :root {
+      --ink: #171916;
+      --paper: rgba(244, 239, 226, 0.92);
+      --paper-solid: #f4efe2;
+      --paper-soft: rgba(244, 239, 226, 0.72);
+      --red: #b6423a;
+      --red-deep: #74312d;
+      --moss: #495c4a;
+      --gold: #c39a5a;
+      --line: rgba(34, 37, 32, 0.14);
+      --shadow: 0 24px 80px rgba(9, 13, 11, 0.28);
+      --radius: 24px;
+      --panel-opacity: .92;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body { min-height: 100%; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #0d1513;
+      overflow-x: hidden;
+    }
+
+    button, input, select { font: inherit; }
+
+    button {
+      color: inherit;
+      border: 0;
+      cursor: pointer;
+    }
+
+    button:disabled { cursor: not-allowed; opacity: .48; }
+
+    .background-root,
+    .wallpaper-layer,
+    .default-scene,
+    .fx-canvas,
+    .theme-overlay,
+    .background-shade {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .background-root { z-index: -5; background: #0d1513; overflow: hidden; }
+
+    .wallpaper-layer {
+      z-index: -5;
+      opacity: 0;
+      overflow: hidden;
+      background: #0d1513;
+      transition: opacity .75s ease;
+    }
+
+    .wallpaper-layer.visible { opacity: 1; }
+
+    .wallpaper-backdrop,
+    .wallpaper-image {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    .wallpaper-backdrop {
+      inset: -9%;
+      width: 118%;
+      height: 118%;
+      background-position: center;
+      background-size: cover;
+      background-repeat: no-repeat;
+      filter: blur(32px) saturate(1.12) brightness(.68);
+      transform: scale(1.08);
+      opacity: 0;
+      transition: opacity .35s ease;
+    }
+
+    .wallpaper-layer.soft-fill .wallpaper-backdrop { opacity: .95; }
+
+    .wallpaper-image {
+      object-fit: cover;
+      object-position: 50% 50%;
+      transform: scale(1);
+      transform-origin: center;
+      transition: opacity .35s ease, transform .2s ease, object-position .2s ease;
+      opacity: 0;
+    }
+
+    .wallpaper-layer.visible .wallpaper-image { opacity: 1; }
+
+    .default-scene {
+      z-index: -4;
+      overflow: hidden;
+      background:
+        linear-gradient(180deg, rgba(11, 18, 16, 0.12), rgba(11, 18, 16, 0.52)),
+        radial-gradient(circle at 75% 17%, rgba(238, 197, 141, 0.23) 0 10%, transparent 28%),
+        linear-gradient(140deg, #24362f 0%, #15231f 45%, #0d1513 100%);
+      transition: opacity .5s ease;
+    }
+
+    .default-scene.hidden { opacity: 0; }
+
+    .sun {
+      position: absolute;
+      width: min(24vw, 280px);
+      aspect-ratio: 1;
+      right: 10vw;
+      top: 7vh;
+      border-radius: 50%;
+      background: radial-gradient(circle at 36% 32%, #f5ddba 0%, #dba267 47%, #b85a42 100%);
+      opacity: 0.88;
+      box-shadow: 0 0 90px rgba(218, 146, 88, 0.25);
+    }
+
+    .mountain {
+      position: absolute;
+      left: -4vw;
+      right: -4vw;
+      bottom: -2px;
+      height: 44vh;
+      background:
+        linear-gradient(165deg, transparent 0 17%, rgba(65, 83, 72, 0.76) 17.2% 34%, transparent 34.2%),
+        linear-gradient(195deg, transparent 0 28%, rgba(36, 56, 48, 0.95) 28.2% 51%, transparent 51.2%),
+        linear-gradient(155deg, transparent 0 39%, rgba(19, 33, 28, 0.98) 39.2% 70%, transparent 70.2%);
+      opacity: 0.92;
+    }
+
+    .shoji {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(244,239,226,.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(244,239,226,.035) 1px, transparent 1px);
+      background-size: 72px 72px;
+      mask-image: linear-gradient(to bottom, black, transparent 72%);
+    }
+
+    .branch {
+      position: absolute;
+      width: 460px;
+      height: 110px;
+      right: -80px;
+      top: 32%;
+      border-top: 9px solid rgba(20, 27, 23, 0.9);
+      border-radius: 60% 0 0 0;
+      transform: rotate(-12deg);
+      opacity: 0.75;
+    }
+
+    .branch::before,
+    .branch::after {
+      content: "";
+      position: absolute;
+      width: 150px;
+      border-top: 5px solid rgba(20, 27, 23, 0.9);
+      transform-origin: right;
+    }
+
+    .branch::before { right: 110px; top: -8px; transform: rotate(28deg); }
+    .branch::after { right: 28px; top: 12px; transform: rotate(-26deg); }
+
+    .fx-canvas { z-index: -2; width: 100%; height: 100%; }
+
+    
+    .theme-overlay {
+      z-index: -1;
+      opacity: 0;
+      transition: opacity .35s ease, background .35s ease, mix-blend-mode .35s ease;
+      background: transparent;
+    }
+
+    .background-shade {
+      z-index: -1;
+      background: rgba(5, 9, 7, .34);
+      backdrop-filter: blur(0px);
+      transition: background .2s ease, backdrop-filter .2s ease;
+    }
+
+    .app {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 28px 0 56px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 24px;
+      color: #f4efe2;
+      margin-bottom: 22px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .mon {
+      width: 50px;
+      height: 50px;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(244, 239, 226, 0.4);
+      border-radius: 50%;
+      background: rgba(7, 14, 11, 0.2);
+      backdrop-filter: blur(12px);
+      font-family: Georgia, serif;
+      font-size: 21px;
+      box-shadow: inset 0 0 0 5px rgba(244,239,226,.06);
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(1.3rem, 3vw, 2.1rem);
+      font-weight: 500;
+      letter-spacing: 0.04em;
+    }
+
+    .brand small {
+      display: block;
+      margin-top: 4px;
+      color: rgba(244, 239, 226, 0.68);
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      font-size: 0.68rem;
+    }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+    }
+
+    .clock {
+      text-align: right;
+      text-shadow: 0 8px 30px rgba(0,0,0,.25);
+    }
+
+    .clock-time {
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(2rem, 6vw, 4.7rem);
+      line-height: 0.95;
+      letter-spacing: -0.04em;
+    }
+
+    .clock-date {
+      margin-top: 8px;
+      color: rgba(244,239,226,.74);
+      text-transform: capitalize;
+    }
+
+    .settings-button {
+      width: 48px;
+      aspect-ratio: 1;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: rgba(8, 14, 11, .38);
+      color: #f4efe2;
+      border: 1px solid rgba(244,239,226,.3);
+      backdrop-filter: blur(14px);
+      font-size: 1.2rem;
+      transition: transform .2s ease, background .2s ease;
+    }
+
+    .settings-button:hover { transform: rotate(25deg); background: rgba(8,14,11,.62); }
+
+    .search-shell {
+      max-width: 760px;
+      margin: 0 auto 22px;
+      background: rgba(244, 239, 226, calc(var(--panel-opacity) - .04));
+      border: 1px solid rgba(255,255,255,.4);
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      padding: 7px 8px 7px 18px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+    }
+
+    .search-shell svg {
+      width: 20px;
+      flex: 0 0 auto;
+      opacity: 0.58;
+    }
+
+    .search-shell input {
+      flex: 1;
+      min-width: 0;
+      border: 0;
+      outline: 0;
+      background: transparent;
+      padding: 12px 14px;
+      color: var(--ink);
+    }
+
+    .search-shell select {
+      border: 0;
+      outline: 0;
+      background: rgba(23,25,22,.06);
+      border-radius: 999px;
+      padding: 10px 12px;
+      color: var(--ink);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.45fr) minmax(300px, .75fr);
+      gap: 20px;
+      align-items: start;
+    }
+
+    .card {
+      background: rgba(244, 239, 226, var(--panel-opacity));
+      border: 1px solid rgba(255,255,255,.44);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(20px);
+      overflow: hidden;
+    }
+
+    .card-header {
+      padding: 22px 24px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .eyebrow {
+      margin: 0 0 4px;
+      font-size: 0.68rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--red-deep);
+      font-weight: 800;
+    }
+
+    .card h2 {
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      font-weight: 500;
+      font-size: 1.45rem;
+    }
+
+    .progress-ring {
+      --p: 0deg;
+      width: 54px;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: conic-gradient(var(--red) var(--p), rgba(23,25,22,.10) 0);
+      position: relative;
+    }
+
+    .progress-ring::before {
+      content: "";
+      position: absolute;
+      inset: 6px;
+      background: #eee8d9;
+      border-radius: inherit;
+    }
+
+    .progress-ring span {
+      position: relative;
+      font-size: 0.72rem;
+      font-weight: 800;
+    }
+
+    .add-task {
+      display: grid;
+      grid-template-columns: 1fr 105px auto;
+      gap: 10px;
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .field {
+      border: 1px solid rgba(23,25,22,.12);
+      background: rgba(255,255,255,.46);
+      border-radius: 14px;
+      padding: 12px 13px;
+      outline: none;
+      min-width: 0;
+      color: var(--ink);
+    }
+
+    .field:focus {
+      border-color: rgba(182,66,58,.55);
+      box-shadow: 0 0 0 4px rgba(182,66,58,.08);
+    }
+
+    .primary {
+      background: var(--red);
+      color: white;
+      border-radius: 14px;
+      padding: 0 17px;
+      font-weight: 800;
+      box-shadow: 0 10px 25px rgba(182,66,58,.2);
+    }
+
+    .primary:hover { background: #a83d36; }
+
+    .repeat-row {
+      grid-column: 1 / -1;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: .82rem;
+      color: rgba(23,25,22,.68);
+    }
+
+    .repeat-row input { accent-color: var(--red); }
+
+    .tasks {
+      list-style: none;
+      padding: 8px 12px 14px;
+      margin: 0;
+      max-height: 550px;
+      overflow: auto;
+    }
+
+    .empty {
+      padding: 48px 24px 58px;
+      text-align: center;
+      color: rgba(23,25,22,.56);
+    }
+
+    .empty-mark {
+      width: 62px;
+      aspect-ratio: 1;
+      margin: 0 auto 14px;
+      border: 1px solid rgba(23,25,22,.13);
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-family: Georgia, serif;
+      font-size: 1.5rem;
+    }
+
+    .task {
+      display: grid;
+      grid-template-columns: auto minmax(0,1fr) auto;
+      gap: 12px;
+      align-items: center;
+      padding: 12px;
+      margin: 5px 0;
+      border-radius: 17px;
+      transition: .2s ease;
+      border: 1px solid transparent;
+    }
+
+    .task:hover {
+      background: rgba(255,255,255,.42);
+      border-color: rgba(23,25,22,.06);
+    }
+
+    .task.active {
+      background: rgba(182,66,58,.075);
+      border-color: rgba(182,66,58,.18);
+    }
+
+    .check {
+      width: 23px;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      border: 1.5px solid rgba(23,25,22,.32);
+      background: transparent;
+      display: grid;
+      place-items: center;
+      font-size: 14px;
+    }
+
+    .task.done .check {
+      background: var(--moss);
+      color: white;
+      border-color: var(--moss);
+    }
+
+    .task-title {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-weight: 750;
+    }
+
+    .task.done .task-title {
+      text-decoration: line-through;
+      opacity: .52;
+    }
+
+    .task-meta {
+      margin-top: 3px;
+      color: rgba(23,25,22,.55);
+      font-size: .75rem;
+    }
+
+    .task-actions {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .icon-btn {
+      width: 34px;
+      aspect-ratio: 1;
+      display: grid;
+      place-items: center;
+      border-radius: 10px;
+      background: transparent;
+      color: rgba(23,25,22,.65);
+    }
+
+    .icon-btn:hover { background: rgba(23,25,22,.08); color: var(--ink); }
+
+    .play-btn {
+      background: rgba(73,92,74,.12);
+      color: var(--moss);
+    }
+
+    .footer-tools {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 24px 20px;
+      border-top: 1px solid var(--line);
+    }
+
+    .ghost {
+      background: transparent;
+      padding: 9px 10px;
+      border-radius: 10px;
+      font-size: .78rem;
+      color: rgba(23,25,22,.58);
+    }
+
+    .ghost:hover { background: rgba(23,25,22,.06); color: var(--ink); }
+
+    .side {
+      display: grid;
+      gap: 20px;
+    }
+
+    .timer-card {
+      padding: 24px;
+      text-align: center;
+      position: sticky;
+      top: 20px;
+    }
+
+    .timer-kicker {
+      color: var(--red-deep);
+      font-size: .68rem;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      font-weight: 800;
+    }
+
+    .focus-name {
+      min-height: 24px;
+      margin: 8px 0 18px;
+      font-weight: 750;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .enso {
+      width: min(250px, 74vw);
+      aspect-ratio: 1;
+      margin: 0 auto;
+      border-radius: 50%;
+      position: relative;
+      display: grid;
+      place-items: center;
+      background:
+        radial-gradient(circle, rgba(244,239,226,1) 0 58%, transparent 59%),
+        conic-gradient(from -90deg, var(--red) var(--timer-p, 0deg), rgba(23,25,22,.08) 0);
+      box-shadow: inset 0 0 0 1px rgba(23,25,22,.05);
+    }
+
+    .enso::after {
+      content: "";
+      position: absolute;
+      inset: 13px;
+      border: 1px solid rgba(23,25,22,.09);
+      border-radius: inherit;
+    }
+
+    .timer-time {
+      position: relative;
+      z-index: 1;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(2.7rem, 8vw, 4.3rem);
+      letter-spacing: -0.06em;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .timer-controls {
+      margin-top: 20px;
+      display: flex;
+      justify-content: center;
+      gap: 9px;
+    }
+
+    .timer-controls button {
+      border-radius: 13px;
+      padding: 11px 15px;
+      font-weight: 800;
+    }
+
+    .start {
+      min-width: 112px;
+      background: var(--ink);
+      color: #f4efe2;
+    }
+
+    .secondary { background: rgba(23,25,22,.08); }
+
+    .duration-edit {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      margin-top: 17px;
+      font-size: .78rem;
+      color: rgba(23,25,22,.62);
+    }
+
+    .duration-edit input {
+      width: 72px;
+      text-align: center;
+      border: 1px solid rgba(23,25,22,.12);
+      border-radius: 10px;
+      background: rgba(255,255,255,.42);
+      padding: 8px;
+      outline: 0;
+    }
+
+    .alarm-label {
+      margin-top: 10px;
+      font-size: .72rem;
+      color: rgba(23,25,22,.5);
+    }
+
+    .quote-card {
+      padding: 21px 22px;
+      color: var(--ink);
+      position: relative;
+    }
+
+    .quote-card::before {
+      content: "静";
+      position: absolute;
+      right: 18px;
+      top: 8px;
+      font-family: Georgia, serif;
+      font-size: 4.5rem;
+      color: rgba(182,66,58,.08);
+    }
+
+    .quote {
+      max-width: 85%;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 1.05rem;
+      line-height: 1.55;
+    }
+
+    .quote small {
+      display: block;
+      margin-top: 9px;
+      color: rgba(23,25,22,.56);
+      font-family: Inter, sans-serif;
+      font-size: .72rem;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    dialog {
+      width: min(430px, calc(100% - 28px));
+      border: 0;
+      border-radius: 22px;
+      background: #f4efe2;
+      color: var(--ink);
+      box-shadow: 0 40px 120px rgba(0,0,0,.45);
+      padding: 0;
+    }
+
+    dialog::backdrop {
+      background: rgba(6, 10, 8, .62);
+      backdrop-filter: blur(6px);
+    }
+
+    .modal { padding: 24px; }
+
+    .modal h3 {
+      margin: 0 0 18px;
+      font-family: Georgia, serif;
+      font-size: 1.5rem;
+      font-weight: 500;
+    }
+
+    .modal label {
+      display: block;
+      margin: 13px 0 6px;
+      font-size: .75rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: rgba(23,25,22,.62);
+    }
+
+    .modal .field { width: 100%; }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 9px;
+      margin-top: 22px;
+    }
+
+    .modal-actions button { padding: 11px 15px; border-radius: 12px; }
+
+    .drawer-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(5, 8, 7, .48);
+      backdrop-filter: blur(4px);
+      z-index: 30;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .25s ease;
+    }
+
+    .drawer-backdrop.open { opacity: 1; pointer-events: auto; }
+
+    .settings-drawer {
+      position: fixed;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      width: min(470px, 100%);
+      z-index: 31;
+      background: #eee8d9;
+      color: var(--ink);
+      box-shadow: -30px 0 90px rgba(0,0,0,.34);
+      transform: translateX(103%);
+      transition: transform .32s cubic-bezier(.2,.8,.2,1);
+      overflow-y: auto;
+    }
+
+    .settings-drawer.open { transform: translateX(0); }
+
+    .drawer-head {
+      position: sticky;
+      top: 0;
+      z-index: 3;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+      padding: 20px 22px;
+      background: rgba(238,232,217,.94);
+      backdrop-filter: blur(18px);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .drawer-head h2 {
+      margin: 0;
+      font-family: Georgia, serif;
+      font-weight: 500;
+    }
+
+    .close-settings {
+      width: 39px;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background: rgba(23,25,22,.08);
+      font-size: 1.25rem;
+    }
+
+    .settings-content { padding: 18px 20px 40px; }
+
+    .settings-section {
+      border: 1px solid rgba(23,25,22,.1);
+      border-radius: 18px;
+      background: rgba(255,255,255,.36);
+      padding: 17px;
+      margin-bottom: 14px;
+    }
+
+    .settings-section h3 {
+      margin: 0 0 4px;
+      font-family: Georgia, serif;
+      font-size: 1.12rem;
+      font-weight: 500;
+    }
+
+    .settings-section .help {
+      margin: 0 0 15px;
+      color: rgba(23,25,22,.58);
+      font-size: .76rem;
+      line-height: 1.45;
+    }
+
+    .setting-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 11px;
+    }
+
+    .setting {
+      display: grid;
+      gap: 6px;
+      margin-top: 11px;
+    }
+
+    .setting:first-child { margin-top: 0; }
+
+    .setting > label,
+    .setting-label {
+      color: rgba(23,25,22,.68);
+      font-size: .7rem;
+      text-transform: uppercase;
+      letter-spacing: .09em;
+      font-weight: 800;
+    }
+
+    .setting input[type="text"],
+    .setting input[type="url"],
+    .setting input[type="number"],
+    .setting select {
+      width: 100%;
+      border: 1px solid rgba(23,25,22,.13);
+      border-radius: 12px;
+      background: rgba(255,255,255,.58);
+      color: var(--ink);
+      padding: 10px 11px;
+      outline: 0;
+    }
+
+    .setting input[type="range"] {
+      width: 100%;
+      accent-color: var(--red);
+    }
+
+    .value-line {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      color: rgba(23,25,22,.58);
+      font-size: .72rem;
+    }
+
+    .setting-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 13px;
+    }
+
+    .setting-actions button,
+    .file-button {
+      border-radius: 11px;
+      padding: 10px 12px;
+      background: rgba(23,25,22,.08);
+      font-weight: 750;
+      font-size: .78rem;
+    }
+
+    .setting-actions .accent { background: var(--red); color: white; }
+
+    .file-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .file-button input { display: none; }
+
+    .switch-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-top: 12px;
+      font-size: .82rem;
+    }
+
+    .switch {
+      position: relative;
+      width: 44px;
+      height: 25px;
+      flex: 0 0 auto;
+    }
+
+    .switch input { opacity: 0; width: 0; height: 0; }
+
+    .slider-switch {
+      position: absolute;
+      inset: 0;
+      border-radius: 999px;
+      background: rgba(23,25,22,.2);
+      transition: .2s ease;
+    }
+
+    .slider-switch::before {
+      content: "";
+      position: absolute;
+      width: 19px;
+      height: 19px;
+      left: 3px;
+      top: 3px;
+      border-radius: 50%;
+      background: white;
+      box-shadow: 0 2px 8px rgba(0,0,0,.2);
+      transition: .2s ease;
+    }
+
+    .switch input:checked + .slider-switch { background: var(--red); }
+    .switch input:checked + .slider-switch::before { transform: translateX(19px); }
+
+    .wallpaper-status {
+      min-height: 18px;
+      margin-top: 10px;
+      color: rgba(23,25,22,.63);
+      font-size: .74rem;
+      line-height: 1.4;
+    }
+
+    .adult-box {
+      margin-top: 14px;
+      padding: 13px;
+      border: 1px solid rgba(139,47,43,.22);
+      border-radius: 14px;
+      background: rgba(139,47,43,.055);
+    }
+
+    .adult-box strong { color: #782e2a; }
+
+    .adult-copy {
+      display: grid;
+      gap: 3px;
+    }
+
+    .adult-copy small,
+    .adult-warning {
+      color: rgba(23,25,22,.58);
+      font-size: .72rem;
+      line-height: 1.45;
+    }
+
+    .adult-options {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(139,47,43,.14);
+    }
+
+    .adult-options.hidden { display: none; }
+
+    .fit-preview-note {
+      margin-top: 8px;
+      color: rgba(23,25,22,.52);
+      font-size: .71rem;
+      line-height: 1.42;
+    }
+
+    .theme-preview {
+      margin-top: 10px;
+      border: 1px solid rgba(23,25,22,.10);
+      border-radius: 14px;
+      padding: 13px 14px;
+      background: rgba(255,255,255,.34);
+    }
+
+    .theme-preview strong {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--red-deep);
+      font-size: .9rem;
+    }
+
+    .theme-preview small {
+      display: block;
+      color: rgba(23,25,22,.58);
+      font-size: .74rem;
+      line-height: 1.5;
+      margin-top: 6px;
+    }
+
+    .theme-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .theme-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 9px;
+      border-radius: 999px;
+      background: rgba(23,25,22,.07);
+      font-size: .71rem;
+      color: rgba(23,25,22,.66);
+    }
+
+    .theme-swatches {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .theme-swatch {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 1px solid rgba(23,25,22,.15);
+      box-shadow: 0 1px 6px rgba(0,0,0,.08);
+    }
+
+    .wallpaper-credit {
+      display: none;
+      margin-top: 8px;
+      color: var(--red-deep);
+      font-size: .73rem;
+      text-decoration: none;
+    }
+
+    .wallpaper-credit.visible { display: inline-block; }
+
+    .danger { color: #8b2f2b !important; }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 24px;
+      transform: translate(-50%, 20px);
+      background: #151b18;
+      color: #f4efe2;
+      padding: 11px 15px;
+      border-radius: 12px;
+      opacity: 0;
+      pointer-events: none;
+      transition: .25s ease;
+      box-shadow: 0 16px 45px rgba(0,0,0,.32);
+      z-index: 60;
+      font-size: .85rem;
+      max-width: min(520px, calc(100% - 28px));
+      text-align: center;
+    }
+
+    .toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+    @media (max-width: 820px) {
+      .grid { grid-template-columns: 1fr; }
+      .timer-card { position: static; }
+      .topbar { align-items: center; }
+      .branch { display: none; }
+    }
+
+    @media (max-width: 560px) {
+      .app { width: min(100% - 18px, 1180px); padding-top: 16px; }
+      .topbar { gap: 10px; }
+      .mon { width: 42px; height: 42px; }
+      .brand small { display: none; }
+      .clock-time { font-size: 2rem; }
+      .clock-date { font-size: .72rem; }
+      .settings-button { width: 42px; }
+      .search-shell select { max-width: 96px; }
+      .add-task { grid-template-columns: 1fr 84px; padding: 15px; }
+      .add-task .primary { grid-column: 1 / -1; min-height: 44px; }
+      .card-header { padding: 18px 17px 14px; }
+      .tasks { padding-inline: 7px; }
+      .footer-tools { padding-inline: 16px; }
+      .task { grid-template-columns: auto minmax(0,1fr); }
+      .task-actions { grid-column: 2; justify-content: flex-start; }
+      .timer-card { padding: 22px 16px; }
+      .setting-grid { grid-template-columns: 1fr; }
+      .settings-content { padding-inline: 13px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .wallpaper-layer, .settings-drawer, .drawer-backdrop, .toast { transition-duration: .001ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="background-root" aria-hidden="true">
+    <div class="wallpaper-layer" id="wallpaperLayer">
+      <div class="wallpaper-backdrop" id="wallpaperBackdrop"></div>
+      <img class="wallpaper-image" id="wallpaperImage" alt="" />
+    </div>
+    <div class="default-scene" id="defaultScene">
+      <div class="sun"></div>
+      <div class="mountain"></div>
+      <div class="shoji"></div>
+      <div class="branch"></div>
+    </div>
+    <canvas class="fx-canvas" id="fxCanvas"></canvas>
+    <div class="theme-overlay" id="themeOverlay"></div>
+      <div class="background-shade" id="backgroundShade"></div>
+  </div>
+
+  <main class="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="mon" id="brandMon">日</div>
+        <div>
+          <h1>静かな一日</h1>
+          <small>um dia tranquilo, uma tarefa de cada vez</small>
+        </div>
+      </div>
+      <div class="top-actions">
+        <div class="clock">
+          <div class="clock-time" id="clockTime">00:00</div>
+          <div class="clock-date" id="clockDate"></div>
+        </div>
+        <button class="settings-button" id="openSettings" type="button" title="Configurações" aria-label="Abrir configurações">⚙</button>
+      </div>
+    </header>
+
+    <form class="search-shell" id="searchForm">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+        <circle cx="11" cy="11" r="7"></circle>
+        <path d="m20 20-3.6-3.6"></path>
+      </svg>
+      <input id="searchInput" autocomplete="off" placeholder="Pesquisar na web..." aria-label="Pesquisar na web" />
+      <select id="searchEngine" aria-label="Mecanismo de busca">
+        <option value="google">Google</option>
+        <option value="duck">DuckDuckGo</option>
+        <option value="youtube">YouTube</option>
+        <option value="wikipedia">Wikipédia</option>
+      </select>
+    </form>
+
+    <section class="grid">
+      <article class="card">
+        <div class="card-header">
+          <div>
+            <p class="eyebrow">今日の道 · caminho de hoje</p>
+            <h2>Checklist diária</h2>
+          </div>
+          <div class="progress-ring" id="progressRing"><span id="progressText">0%</span></div>
+        </div>
+
+        <form class="add-task" id="taskForm">
+          <input class="field" id="taskTitle" placeholder="Adicionar uma tarefa..." maxlength="120" required />
+          <input class="field" id="taskMinutes" type="number" min="1" max="1440" value="25" aria-label="Minutos" />
+          <button class="primary" type="submit">Adicionar</button>
+          <label class="repeat-row">
+            <input id="taskRepeat" type="checkbox" checked />
+            Repetir diariamente e reiniciar a conclusão no dia seguinte
+          </label>
+        </form>
+
+        <ul class="tasks" id="taskList"></ul>
+
+        <div class="footer-tools">
+          <button class="ghost" id="clearDone" type="button">Remover concluídas</button>
+          <button class="ghost" id="resetDay" type="button">Reiniciar o dia</button>
+        </div>
+      </article>
+
+      <aside class="side">
+        <article class="card timer-card">
+          <div class="timer-kicker">集中 · foco</div>
+          <div class="focus-name" id="focusName">Selecione uma tarefa</div>
+
+          <div class="enso" id="enso">
+            <div class="timer-time" id="timerTime">25:00</div>
+          </div>
+
+          <div class="timer-controls">
+            <button class="start" id="toggleTimer" type="button">Iniciar</button>
+            <button class="secondary" id="resetTimer" type="button">Reiniciar</button>
+          </div>
+
+          <label class="duration-edit">
+            Duração
+            <input id="durationInput" type="number" min="1" max="1440" value="25" />
+            min
+          </label>
+          <div class="alarm-label" id="activeAlarmLabel">Alarme: padrão</div>
+        </article>
+
+        <article class="card quote-card">
+          <div class="quote">
+            “Até a jornada mais longa é atravessada um passo por vez.”
+            <small>一歩ずつ · ippo zutsu</small>
+          </div>
+        </article>
+      </aside>
+    </section>
+  </main>
+
+  <dialog id="editDialog">
+    <form class="modal" id="editForm" method="dialog">
+      <h3>Editar tarefa</h3>
+      <label for="editTitle">Título</label>
+      <input class="field" id="editTitle" maxlength="120" required />
+
+      <label for="editMinutes">Timer em minutos</label>
+      <input class="field" id="editMinutes" type="number" min="1" max="1440" required />
+
+      <label for="editAlarm">Alarme desta tarefa</label>
+      <select class="field" id="editAlarm">
+        <option value="default">Usar o alarme padrão</option>
+        <option value="temple">Sino de templo</option>
+        <option value="soft">Suave</option>
+        <option value="digital">Digital</option>
+        <option value="urgent">Urgente</option>
+        <option value="custom">Áudio personalizado</option>
+      </select>
+
+      <label class="repeat-row" style="margin-top:15px">
+        <input id="editRepeat" type="checkbox" />
+        Repetir diariamente
+      </label>
+
+      <div class="modal-actions">
+        <button class="secondary" value="cancel" type="button" id="cancelEdit">Cancelar</button>
+        <button class="primary" value="default" type="submit">Salvar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div class="drawer-backdrop" id="drawerBackdrop"></div>
+  <aside class="settings-drawer" id="settingsDrawer" aria-label="Configurações">
+    <div class="drawer-head">
+      <div>
+        <p class="eyebrow">設定 · personalização</p>
+        <h2>Configurações</h2>
+      </div>
+      <button class="close-settings" id="closeSettings" type="button" aria-label="Fechar configurações">×</button>
+    </div>
+
+    <div class="settings-content">
+<section class="settings-section">
+  <h3>Temas gerais</h3>
+  <p class="help">Troque a identidade visual inteira da página. Há temas originais e temas inspirados em atmosferas como hacker, Wired/Lain e Frieren.</p>
+
+  <div class="setting">
+    <label for="themePreset">Tema</label>
+    <select id="themePreset">
+      <option value="japanese">Japonês clássico</option>
+      <option value="hacker">Hacker terminal</option>
+      <option value="lain">Wired / Lain</option>
+      <option value="frieren">Frieren / fantasia serena</option>
+      <option value="cyberpunk">Cyberpunk neon</option>
+      <option value="manga_noir">Mangá noir</option>
+      <option value="shrine_autumn">Santuário de outono</option>
+      <option value="moonlit_study">Estudo ao luar</option>
+      <option value="rainy_noir">Noite chuvosa</option>
+      <option value="vaporwave">Vaporwave</option>
+      <option value="retro_terminal">Terminal retrô</option>
+      <option value="sakura_dream">Sakura dream</option>
+      <option value="forest_spirit">Espírito da floresta</option>
+      <option value="ocean_breeze">Brisa oceânica</option>
+      <option value="occult_library">Biblioteca oculta</option>
+      <option value="neon_tokyo">Tokyo neon</option>
+      <option value="lofi_night">Lofi night</option>
+      <option value="winter_monastery">Mosteiro de inverno</option>
+    </select>
+  </div>
+
+  <div class="theme-preview" id="themeDescription">
+    <strong>Japonês clássico</strong>
+    Visual tranquilo com pétalas, tons de papel e vermelho tradicional.
+  </div>
+
+  <div class="setting-actions">
+    <button class="accent" id="applyThemePreset" type="button">Aplicar tema</button>
+    <button id="applyThemeWithWallpaper" type="button">Tema + wallpaper</button>
+    <button id="cycleTheme" type="button">Tema aleatório</button>
+  </div>
+</section>
+
+
+      <section class="settings-section">
+        <h3>Papel de parede</h3>
+        <p class="help">Use a arte japonesa original, uma imagem do computador, uma URL ou busque automaticamente uma imagem de anime em modo seguro.</p>
+
+        <div class="setting">
+          <label for="wallpaperUrl">URL da imagem</label>
+          <input id="wallpaperUrl" type="url" placeholder="https://site.com/imagem.jpg" />
+        </div>
+
+        <div class="setting-actions">
+          <button id="applyWallpaperUrl" type="button">Aplicar URL</button>
+          <label class="file-button">
+            Escolher arquivo
+            <input id="wallpaperFile" type="file" accept="image/*" />
+          </label>
+          <button id="restoreBuiltin" type="button">Fundo original</button>
+        </div>
+
+        <div class="setting-grid" style="margin-top:14px">
+          <div class="setting">
+            <label for="wallpaperProvider">Fonte automática</label>
+            <select id="wallpaperProvider">
+              <option value="auto">Automático (com alternativas)</option>
+              <option value="konachan">Konachan (conforme o modo)</option>
+              <option value="waifu">Waifu.im (conforme o modo)</option>
+              <option value="nekos">Nekos.best SFW</option>
+            </select>
+          </div>
+          <div class="setting">
+            <label for="wallpaperRotate">Trocar automaticamente</label>
+            <select id="wallpaperRotate">
+              <option value="off">Desativado</option>
+              <option value="launch">Ao abrir</option>
+              <option value="15">A cada 15 minutos</option>
+              <option value="30">A cada 30 minutos</option>
+              <option value="60">A cada 1 hora</option>
+              <option value="daily">Uma vez por dia</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="setting">
+          <label for="wallpaperTags">Tags para Konachan</label>
+          <input id="wallpaperTags" type="text" placeholder="ex.: scenery night city" />
+        </div>
+
+        <div class="adult-box">
+          <div class="switch-row" style="margin-top:0">
+            <div class="adult-copy">
+              <strong>Modo NSFW — somente para maiores de 18 anos</strong>
+              <small>Usa o Waifu.im como fonte principal e o Konachan como alternativa.</small>
+            </div>
+            <label class="switch">
+              <input id="adultMode" type="checkbox" />
+              <span class="slider-switch"></span>
+            </label>
+          </div>
+
+          <div class="adult-options hidden" id="adultOptions">
+            <div class="setting">
+              <label for="adultRating">Nível no Konachan</label>
+              <select id="adultRating">
+                <option value="questionable">Sensual / questionável</option>
+                <option value="explicit">Explícito</option>
+                <option value="mixed">Questionável + explícito</option>
+              </select>
+            </div>
+            <p class="adult-warning">
+              O Waifu.im fornece uma categoria NSFW geral; a distinção abaixo é usada quando
+              o Konachan responde. A página também rejeita resultados com tags bloqueadas,
+              mas classificações de terceiros não são infalíveis.
+            </p>
+          </div>
+        </div>
+
+        <div class="setting-actions">
+          <button class="accent" id="randomWallpaper" type="button">Buscar wallpaper agora</button>
+        </div>
+
+        <div class="setting-grid" style="margin-top:14px">
+          <div class="setting">
+            <label for="wallpaperFit">Encaixe</label>
+            <select id="wallpaperFit">
+              <option value="smart">Inteligente</option>
+              <option value="cover">Preencher e recortar</option>
+              <option value="contain">Imagem inteira + bordas desfocadas</option>
+              <option value="stretch">Esticar para a tela</option>
+            </select>
+          </div>
+          <div class="setting">
+            <label for="wallpaperZoom">Zoom</label>
+            <input id="wallpaperZoom" type="range" min="70" max="180" value="100" />
+            <div class="value-line"><span>70%</span><span id="wallpaperZoomValue">100%</span><span>180%</span></div>
+          </div>
+        </div>
+
+        <div class="setting-grid">
+          <div class="setting">
+            <label for="wallpaperFocusX">Ponto focal horizontal</label>
+            <input id="wallpaperFocusX" type="range" min="0" max="100" value="50" />
+            <div class="value-line"><span>Esquerda</span><span id="wallpaperFocusXValue">50%</span><span>Direita</span></div>
+          </div>
+          <div class="setting">
+            <label for="wallpaperFocusY">Ponto focal vertical</label>
+            <input id="wallpaperFocusY" type="range" min="0" max="100" value="50" />
+            <div class="value-line"><span>Topo</span><span id="wallpaperFocusYValue">50%</span><span>Base</span></div>
+          </div>
+        </div>
+
+        <div class="setting-actions">
+          <button id="resetWallpaperFraming" type="button">Centralizar e remover zoom</button>
+        </div>
+        <p class="fit-preview-note">
+          O modo inteligente preserva melhor wallpapers verticais e usa uma cópia desfocada
+          para preencher o restante da tela.
+        </p>
+
+        <div class="setting">
+          <div class="value-line"><label for="backgroundDim">Escurecimento</label><span id="backgroundDimValue">34%</span></div>
+          <input id="backgroundDim" type="range" min="0" max="80" value="34" />
+        </div>
+
+        <div class="setting">
+          <div class="value-line"><label for="backgroundBlur">Desfoque</label><span id="backgroundBlurValue">0 px</span></div>
+          <input id="backgroundBlur" type="range" min="0" max="18" value="0" />
+        </div>
+
+        <div class="wallpaper-status" id="wallpaperStatus"></div>
+        <a class="wallpaper-credit" id="wallpaperCredit" target="_blank" rel="noreferrer">Abrir fonte da imagem ↗</a>
+      </section>
+
+      <section class="settings-section">
+        <h3>Animação de fundo</h3>
+        <p class="help">As animações são desenhadas pela própria página e funcionam sem baixar vídeos.</p>
+
+        <div class="setting-grid">
+          <div class="setting">
+            <label for="animationType">Estilo</label>
+            <select id="animationType">
+              <option value="sakura">Sakura</option>
+              <option value="matrix">Hacker / Matrix</option>
+              <option value="manga">Mangá</option>
+              <option value="rain">Chuva</option>
+              <option value="cyber">Grade cyberpunk</option>
+              <option value="fireflies">Vagalumes</option>
+              <option value="snow">Neve</option>
+              <option value="stars">Estrelas</option>
+              <option value="embers">Brasas / folhas</option>
+              <option value="glitch">Glitch digital</option>
+              <option value="bubbles">Bolhas / orbes</option>
+              <option value="orbits">Órbitas</option>
+              <option value="none">Nenhuma</option>
+            </select>
+          </div>
+          <div class="setting">
+            <label for="animationIntensity">Quantidade</label>
+            <select id="animationIntensity">
+              <option value="low">Baixa</option>
+              <option value="medium">Média</option>
+              <option value="high">Alta</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="setting">
+          <div class="value-line"><label for="animationSpeed">Velocidade</label><span id="animationSpeedValue">100%</span></div>
+          <input id="animationSpeed" type="range" min="35" max="220" value="100" />
+        </div>
+      </section>
+
+      <section class="settings-section">
+        <h3>Alarme do timer</h3>
+        <p class="help">Escolha o som padrão, o volume e quantas vezes ele toca. Cada tarefa pode substituir o som padrão na opção “Editar”.</p>
+
+        <div class="setting-grid">
+          <div class="setting">
+            <label for="alarmTone">Som padrão</label>
+            <select id="alarmTone">
+              <option value="temple">Sino de templo</option>
+              <option value="soft">Suave</option>
+              <option value="digital">Digital</option>
+              <option value="urgent">Urgente</option>
+              <option value="custom">Áudio personalizado</option>
+            </select>
+          </div>
+          <div class="setting">
+            <label for="alarmRepeats">Repetições</label>
+            <select id="alarmRepeats">
+              <option value="1">1 vez</option>
+              <option value="2">2 vezes</option>
+              <option value="3">3 vezes</option>
+              <option value="5">5 vezes</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="setting">
+          <div class="value-line"><label for="alarmVolume">Volume</label><span id="alarmVolumeValue">70%</span></div>
+          <input id="alarmVolume" type="range" min="0" max="100" value="70" />
+        </div>
+
+        <div class="setting-actions">
+          <label class="file-button">
+            Escolher áudio
+            <input id="alarmFile" type="file" accept="audio/*" />
+          </label>
+          <button id="testAlarm" type="button">Testar alarme</button>
+        </div>
+        <div class="wallpaper-status" id="alarmFileStatus">Nenhum áudio personalizado selecionado.</div>
+
+        <div class="switch-row">
+          <span>Mostrar notificação ao terminar</span>
+          <label class="switch">
+            <input id="notificationsEnabled" type="checkbox" checked />
+            <span class="slider-switch"></span>
+          </label>
+        </div>
+      </section>
+
+      <section class="settings-section">
+        <h3>Aparência dos painéis</h3>
+        <div class="setting">
+          <div class="value-line"><label for="panelOpacity">Opacidade</label><span id="panelOpacityValue">92%</span></div>
+          <input id="panelOpacity" type="range" min="58" max="100" value="92" />
+        </div>
+      </section>
+
+      <section class="settings-section">
+        <h3>Dados</h3>
+        <p class="help">As tarefas e preferências ficam somente no armazenamento local deste navegador.</p>
+        <div class="setting-actions">
+          <button id="exportSettings" type="button">Exportar configurações</button>
+          <label class="file-button">
+            Importar configurações
+            <input id="importSettings" type="file" accept="application/json" />
+          </label>
+          <button class="danger" id="resetEverything" type="button">Apagar tudo</button>
+        </div>
+      </section>
+    </div>
+  </aside>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    (() => {
+      "use strict";
+
+      const STORAGE_KEY = "shizuka-home-v5";
+      const OLD_STORAGE_KEYS = ["shizuka-home-v4", "shizuka-home-v3", "shizuka-home-v2", "shizuka-home-v1"];
+      const DB_NAME = "shizuka-home-assets";
+      const DB_STORE = "assets";
+      const pad = n => String(n).padStart(2, "0");
+      const todayKey = () => new Date().toLocaleDateString("en-CA");
+      const uid = () => crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`;
+
+      const defaultSettings = {
+        wallpaperMode: "builtin",
+        wallpaperUrl: "",
+        wallpaperCreditUrl: "",
+        wallpaperProvider: "auto",
+        wallpaperTags: "scenery",
+        wallpaperRotate: "off",
+        wallpaperFit: "smart",
+        wallpaperPosition: "center",
+        wallpaperZoom: 100,
+        wallpaperFocusX: 50,
+        wallpaperFocusY: 50,
+        adultMode: false,
+        adultRating: "questionable",
+        adultConfirmed: false,
+        themePreset: "japanese",
+        backgroundDim: 34,
+        backgroundBlur: 0,
+        animationType: "sakura",
+        animationIntensity: "medium",
+        animationSpeed: 100,
+        alarmTone: "temple",
+        alarmRepeats: 2,
+        alarmVolume: 70,
+        notificationsEnabled: true,
+        customAlarmName: "",
+        panelOpacity: 92,
+        lastWallpaperFetch: "",
+        lastWallpaperDay: ""
+      };
+
+      
+const THEME_PRESETS = {
+  japanese: { name: "japonês clássico", symbol: "日", description: "Visual tranquilo com papel, vermelho tradicional, sakura e atmosfera contemplativa.", recommendedAnimation: "sakura", wallpaperTags: "scenery shrine temple sunset japan", wallpaperProvider: "auto", palette: { ink: "#171916", red: "#b6423a", redDeep: "#74312d", moss: "#495c4a", gold: "#c39a5a" }, bodyBg: "#0d1513", sceneBackground: "linear-gradient(180deg, rgba(11, 18, 16, 0.12), rgba(11, 18, 16, 0.52)), radial-gradient(circle at 75% 17%, rgba(238, 197, 141, 0.23) 0 10%, transparent 28%), linear-gradient(140deg, #24362f 0%, #15231f 45%, #0d1513 100%)", sunBackground: "radial-gradient(circle at 36% 32%, #f5ddba 0%, #dba267 47%, #b85a42 100%)", overlayStyle: "", animationType: "sakura", animationIntensity: "medium", animationSpeed: 100, backgroundDim: 34, backgroundBlur: 0, panelOpacity: 92 },
+  hacker: { name: "hacker terminal", symbol: "電", description: "Verde terminal, scanlines e clima de console obscuro.", recommendedAnimation: "matrix", wallpaperTags: "computer server circuit city night neon", wallpaperProvider: "auto", palette: { ink: "#051208", red: "#3cf281", redDeep: "#1f8e4b", moss: "#166639", gold: "#8fffb5" }, bodyBg: "#020b05", sceneBackground: "linear-gradient(180deg, rgba(4, 12, 7, 0.10), rgba(4, 12, 7, 0.58)), radial-gradient(circle at 70% 18%, rgba(67, 255, 161, 0.09) 0 10%, transparent 30%), linear-gradient(140deg, #07120d 0%, #030805 45%, #010402 100%)", sunBackground: "radial-gradient(circle at 36% 32%, #b5ffd1 0%, #34db78 47%, #0b5b2e 100%)", overlayStyle: "opacity:.28;mix-blend-mode:screen;background:repeating-linear-gradient(to bottom, rgba(120,255,160,.09) 0 2px, transparent 2px 5px), linear-gradient(90deg, rgba(0,255,150,.06), transparent 32%, rgba(0,255,150,.03) 67%, transparent);", animationType: "matrix", animationIntensity: "high", animationSpeed: 115, backgroundDim: 42, backgroundBlur: 0, panelOpacity: 88 },
+  lain: { name: "wired / lain", symbol: "線", description: "Tons frios, ruído digital e a sensação de estar conectado ao Wired.", recommendedAnimation: "glitch", wallpaperTags: "night city wires power_lines computer monochrome", wallpaperProvider: "auto", palette: { ink: "#101513", red: "#89d0b3", redDeep: "#4a7768", moss: "#5a7a72", gold: "#cfdad3" }, bodyBg: "#070909", sceneBackground: "linear-gradient(180deg, rgba(6, 8, 8, 0.18), rgba(6, 8, 8, 0.66)), radial-gradient(circle at 72% 20%, rgba(179, 255, 221, 0.08) 0 8%, transparent 30%), linear-gradient(140deg, #101515 0%, #0a0c0c 46%, #050707 100%)", sunBackground: "radial-gradient(circle at 36% 32%, #d7e9df 0%, #9fc8b4 48%, #49645b 100%)", overlayStyle: "opacity:.34;mix-blend-mode:screen;background:repeating-linear-gradient(to bottom, rgba(255,255,255,.05) 0 1px, transparent 1px 4px), linear-gradient(90deg, rgba(125,255,185,.07), rgba(255,255,255,0) 40%, rgba(125,255,185,.05));", animationType: "glitch", animationIntensity: "medium", animationSpeed: 100, backgroundDim: 46, backgroundBlur: 1, panelOpacity: 90 },
+  frieren: { name: "frieren / fantasia serena", symbol: "旅", description: "Clima de jornada silenciosa, céu claro, campo, magia suave e calma melancólica.", recommendedAnimation: "fireflies", wallpaperTags: "frieren landscape sky field fantasy ruins clouds meadow", wallpaperProvider: "auto", palette: { ink: "#24323a", red: "#7e9dcc", redDeep: "#5872a2", moss: "#6a8b79", gold: "#d8bc79" }, bodyBg: "#13202a", sceneBackground: "linear-gradient(180deg, rgba(17, 30, 41, 0.05), rgba(17, 30, 41, 0.35)), radial-gradient(circle at 73% 16%, rgba(255, 239, 168, 0.26) 0 11%, transparent 29%), linear-gradient(150deg, #405a73 0%, #213547 46%, #172430 100%)", sunBackground: "radial-gradient(circle at 36% 32%, #fff1b4 0%, #d7c27a 47%, #7ea0d3 100%)", overlayStyle: "opacity:.14;background:linear-gradient(180deg, rgba(255,255,255,.12), transparent 42%), radial-gradient(circle at 15% 15%, rgba(255,245,210,.10), transparent 24%);", animationType: "fireflies", animationIntensity: "medium", animationSpeed: 88, backgroundDim: 24, backgroundBlur: 0, panelOpacity: 94 },
+  cyberpunk: { name: "cyberpunk neon", symbol: "夜", description: "Neon magenta e ciano com visual urbano futurista.", recommendedAnimation: "cyber", wallpaperTags: "city night neon cyberpunk rain lights", wallpaperProvider: "auto", palette: { ink: "#180d1e", red: "#ff4ecb", redDeep: "#a245b2", moss: "#38d7d5", gold: "#ffe15f" }, bodyBg: "#0a0715", sceneBackground: "linear-gradient(180deg, rgba(11, 7, 21, 0.16), rgba(11, 7, 21, 0.64)), radial-gradient(circle at 73% 16%, rgba(255, 78, 203, 0.18) 0 11%, transparent 30%), linear-gradient(150deg, #22133c 0%, #0c0a1c 50%, #06050e 100%)", sunBackground: "radial-gradient(circle at 36% 32%, #ffe06c 0%, #ff4ecb 44%, #4ddcff 100%)", overlayStyle: "opacity:.22;mix-blend-mode:screen;background:linear-gradient(180deg, rgba(255,0,168,.06), transparent 36%), linear-gradient(90deg, rgba(0,235,255,.07), transparent 55%);", animationType: "cyber", animationIntensity: "high", animationSpeed: 120, backgroundDim: 40, backgroundBlur: 0, panelOpacity: 89 },
+  manga_noir: { name: "mangá noir", symbol: "墨", description: "Branco, preto e cinza com energia gráfica de páginas de mangá.", recommendedAnimation: "manga", wallpaperTags: "monochrome city dramatic sky manga", wallpaperProvider: "auto", palette: { ink: "#111111", red: "#303030", redDeep: "#000000", moss: "#666666", gold: "#afafaf" }, bodyBg: "#090909", sceneBackground: "linear-gradient(180deg, rgba(10, 10, 10, 0.08), rgba(10, 10, 10, 0.58)), radial-gradient(circle at 73% 16%, rgba(255, 255, 255, 0.10) 0 9%, transparent 28%), linear-gradient(150deg, #4c4c4c 0%, #1f1f1f 50%, #090909 100%)", sunBackground: "radial-gradient(circle at 36% 32%, #ffffff 0%, #d7d7d7 47%, #6a6a6a 100%)", overlayStyle: "opacity:.10;background:radial-gradient(circle at 20% 30%, rgba(255,255,255,.08), transparent 22%), radial-gradient(circle at 70% 65%, rgba(255,255,255,.05), transparent 20%);", animationType: "manga", animationIntensity: "medium", animationSpeed: 105, backgroundDim: 32, backgroundBlur: 0, panelOpacity: 95 },
+  shrine_autumn: { name: "santuário de outono", symbol: "秋", description: "Folhas douradas, vermelho queimado e atmosfera ritual de fim de tarde.", recommendedAnimation: "embers", wallpaperTags: "autumn shrine leaves temple sunset forest", wallpaperProvider: "auto", palette: { ink: "#2c2218", red: "#c4512f", redDeep: "#7b2f22", moss: "#7d6745", gold: "#d89d45" }, bodyBg: "#1b120d", sceneBackground: "linear-gradient(180deg, rgba(23, 16, 12, 0.10), rgba(23, 16, 12, 0.56)), radial-gradient(circle at 72% 16%, rgba(255, 188, 98, 0.24) 0 10%, transparent 28%), linear-gradient(148deg, #664328 0%, #311d13 48%, #150d09 100%)", sunBackground: "radial-gradient(circle at 36% 32%, #ffd7a6 0%, #f39442 47%, #b24526 100%)", overlayStyle: "opacity:.14;background:linear-gradient(180deg, rgba(255,196,112,.08), transparent 36%);", animationType: "embers", animationIntensity: "medium", animationSpeed: 100, backgroundDim: 30, backgroundBlur: 0, panelOpacity: 91 },
+  moonlit_study: { name: "estudo ao luar", symbol: "月", description: "Azul profundo, luz de lua e clima silencioso de leitura noturna.", recommendedAnimation: "stars", wallpaperTags: "moon night room library sky stars", wallpaperProvider: "auto", palette: { ink: "#152033", red: "#6f85c2", redDeep: "#46598a", moss: "#65749c", gold: "#b5c7ff" }, bodyBg: "#08101d", sceneBackground: "linear-gradient(180deg, rgba(8, 16, 29, 0.04), rgba(8, 16, 29, 0.52)), radial-gradient(circle at 73% 16%, rgba(210, 227, 255, 0.22) 0 9%, transparent 28%), linear-gradient(150deg, #20334d 0%, #101927 48%, #060b11 100%)", sunBackground: "radial-gradient(circle at 36% 32%, #e9f0ff 0%, #acc0ff 47%, #5c73ad 100%)", overlayStyle: "opacity:.18;background:linear-gradient(180deg, rgba(255,255,255,.05), transparent 30%);", animationType: "stars", animationIntensity: "medium", animationSpeed: 85, backgroundDim: 28, backgroundBlur: 0, panelOpacity: 93 },
+  rainy_noir: { name: "noite chuvosa", symbol: "雨", description: "Ambiente melancólico com chuva, asfalto molhado e névoa azulada.", recommendedAnimation: "rain", wallpaperTags: "rain city night street lights", wallpaperProvider: "auto", palette: { ink: "#15212b", red: "#6f8796", redDeep: "#455666", moss: "#70828a", gold: "#aac1d4" }, bodyBg: "#070d11", sceneBackground: "linear-gradient(180deg, rgba(9, 14, 18, 0.12), rgba(9, 14, 18, 0.62)), radial-gradient(circle at 72% 16%, rgba(180, 211, 228, 0.12) 0 9%, transparent 28%), linear-gradient(148deg, #1f3742 0%, #111a20 48%, #070d11 100%)", sunBackground: "radial-gradient(circle at 36% 32%, #d8e4ef 0%, #7a93a7 47%, #304454 100%)", overlayStyle: "opacity:.16;background:linear-gradient(180deg, rgba(255,255,255,.03), transparent 25%);", animationType: "rain", animationIntensity: "high", animationSpeed: 115, backgroundDim: 44, backgroundBlur: 1, panelOpacity: 90 },
+  vaporwave: { name: "vaporwave", symbol: "夢", description: "Gradientes rosa/roxo, nostalgia digital e brilho sonhador.", recommendedAnimation: "orbits", wallpaperTags: "neon sunset city sky retro", wallpaperProvider: "auto", palette: { ink: "#281838", red: "#ff71ce", redDeep: "#b84bf5", moss: "#41ead4", gold: "#ffe56d" }, bodyBg: "#14091c", sceneBackground: "linear-gradient(180deg, rgba(20, 9, 28, 0.12), rgba(20, 9, 28, 0.56)), radial-gradient(circle at 73% 16%, rgba(255, 113, 206, 0.22) 0 10%, transparent 29%), linear-gradient(150deg, #4a2068 0%, #1b1236 48%, #0b0817 100%)", sunBackground: "radial-gradient(circle at 36% 32%, #ffe870 0%, #ff71ce 47%, #01cdfd 100%)", overlayStyle: "opacity:.20;mix-blend-mode:screen;background:linear-gradient(180deg, rgba(255,255,255,.05), transparent 35%), linear-gradient(90deg, rgba(1,205,253,.05), transparent 50%, rgba(255,113,206,.05));", animationType: "orbits", animationIntensity: "medium", animationSpeed: 110, backgroundDim: 28, backgroundBlur: 0, panelOpacity: 89 },
+  retro_terminal: { name: "terminal retrô", symbol: "⌘", description: "Tela âmbar/verde com nostalgia de monitor CRT e linhas antigas.", recommendedAnimation: "matrix", wallpaperTags: "retro computer terminal keyboard dark", wallpaperProvider: "auto", palette: { ink: "#20180f", red: "#ffb84d", redDeep: "#b56d1d", moss: "#848055", gold: "#f1c374" }, bodyBg: "#090704", sceneBackground: "linear-gradient(180deg, rgba(12, 8, 4, 0.16), rgba(12, 8, 4, 0.56)), radial-gradient(circle at 73% 16%, rgba(255, 196, 102, 0.15) 0 9%, transparent 29%), linear-gradient(150deg, #3e2b16 0%, #1a1109 48%, #070503 100%)", sunBackground: "radial-gradient(circle at 36% 32%, #ffe4b0 0%, #ffbf58 47%, #7b4f18 100%)", overlayStyle: "opacity:.22;mix-blend-mode:screen;background:repeating-linear-gradient(to bottom, rgba(255,196,112,.08) 0 2px, transparent 2px 5px);", animationType: "matrix", animationIntensity: "medium", animationSpeed: 92, backgroundDim: 36, backgroundBlur: 0, panelOpacity: 91 },
+  sakura_dream: { name: "sakura dream", symbol: "花", description: "Rosa suave, nuvens claras e leveza onírica.", recommendedAnimation: "sakura", wallpaperTags: "cherry_blossoms spring sky petals", wallpaperProvider: "auto", palette: { ink: "#3a2630", red: "#ed7d9a", redDeep: "#b65374", moss: "#8ba795", gold: "#f7c8d8" }, bodyBg: "#21121b", sceneBackground: "linear-gradient(180deg, rgba(33, 18, 27, 0.07), rgba(33, 18, 27, 0.36)), radial-gradient(circle at 73% 16%, rgba(255, 216, 230, 0.24) 0 11%, transparent 29%), linear-gradient(150deg, #6f4a61 0%, #34202f 46%, #181015 100%)", sunBackground: "radial-gradient(circle at 36% 32%, #fff4f6 0%, #f7c3d1 47%, #e47b99 100%)", overlayStyle: "opacity:.12;background:linear-gradient(180deg, rgba(255,255,255,.06), transparent 32%);", animationType: "sakura", animationIntensity: "high", animationSpeed: 94, backgroundDim: 22, backgroundBlur: 0, panelOpacity: 94 },
+  forest_spirit: { name: "espírito da floresta", symbol: "森", description: "Verde profundo, névoa e pontos de luz como criaturas da mata.", recommendedAnimation: "fireflies", wallpaperTags: "forest mist nature shrine", wallpaperProvider: "auto", palette: { ink: "#112216", red: "#4a9b67", redDeep: "#2f6842", moss: "#5f8768", gold: "#bcd58f" }, bodyBg: "#07120b", sceneBackground: "linear-gradient(180deg, rgba(7, 18, 11, 0.08), rgba(7, 18, 11, 0.56)), radial-gradient(circle at 73% 16%, rgba(190, 224, 150, 0.14) 0 9%, transparent 28%), linear-gradient(150deg, #1f4630 0%, #0f2014 46%, #061008 100%)", sunBackground: "radial-gradient(circle at 36% 32%, #e9f6c9 0%, #8ec77b 47%, #35624a 100%)", overlayStyle: "opacity:.10;background:radial-gradient(circle at 15% 22%, rgba(255,255,255,.05), transparent 20%);", animationType: "fireflies", animationIntensity: "high", animationSpeed: 86, backgroundDim: 34, backgroundBlur: 1, panelOpacity: 92 },
+  ocean_breeze: { name: "brisa oceânica", symbol: "海", description: "Azul-marinho, espuma clara e sensação de ar aberto.", recommendedAnimation: "bubbles", wallpaperTags: "ocean coast sky waves clouds", wallpaperProvider: "auto", palette: { ink: "#143040", red: "#4cb3d4", redDeep: "#2b7b96", moss: "#5f97a8", gold: "#bbe5f0" }, bodyBg: "#081722", sceneBackground: "linear-gradient(180deg, rgba(8, 23, 34, 0.06), rgba(8, 23, 34, 0.44)), radial-gradient(circle at 73% 16%, rgba(193, 234, 245, 0.18) 0 10%, transparent 28%), linear-gradient(150deg, #327695 0%, #16384b 46%, #091823 100%)", sunBackground: "radial-gradient(circle at 36% 32%, #ecf8ff 0%, #8fd7ee 47%, #3b90b1 100%)", overlayStyle: "opacity:.14;background:linear-gradient(180deg, rgba(255,255,255,.05), transparent 30%);", animationType: "bubbles", animationIntensity: "medium", animationSpeed: 90, backgroundDim: 24, backgroundBlur: 0, panelOpacity: 93 },
+  occult_library: { name: "biblioteca oculta", symbol: "書", description: "Marrom escuro, dourado gasto e silêncio de estantes antigas.", recommendedAnimation: "embers", wallpaperTags: "library candles books old room", wallpaperProvider: "auto", palette: { ink: "#2c1e16", red: "#8d5d3a", redDeep: "#5d3c24", moss: "#6f5b44", gold: "#d8ad63" }, bodyBg: "#100907", sceneBackground: "linear-gradient(180deg, rgba(16, 9, 7, 0.10), rgba(16, 9, 7, 0.58)), radial-gradient(circle at 73% 16%, rgba(240, 185, 100, 0.18) 0 10%, transparent 30%), linear-gradient(150deg, #4c2d1d 0%, #20120c 46%, #0d0705 100%)", sunBackground: "radial-gradient(circle at 36% 32%, #fde2ae 0%, #d49c53 47%, #78502b 100%)", overlayStyle: "opacity:.12;background:linear-gradient(180deg, rgba(255,255,255,.03), transparent 25%);", animationType: "embers", animationIntensity: "low", animationSpeed: 72, backgroundDim: 40, backgroundBlur: 0, panelOpacity: 93 },
+  neon_tokyo: { name: "tokyo neon", symbol: "都", description: "Cidade brilhante, outdoors coloridos e energia de madrugada.", recommendedAnimation: "cyber", wallpaperTags: "tokyo night city neon street", wallpaperProvider: "auto", palette: { ink: "#23101d", red: "#ff3366", redDeep: "#c5208a", moss: "#1de0c5", gold: "#ffd94d" }, bodyBg: "#0d0612", sceneBackground: "linear-gradient(180deg, rgba(13, 6, 18, 0.12), rgba(13, 6, 18, 0.62)), radial-gradient(circle at 73% 16%, rgba(255, 51, 102, 0.18) 0 10%, transparent 29%), linear-gradient(150deg, #3b0e38 0%, #150a1f 46%, #08050c 100%)", sunBackground: "radial-gradient(circle at 36% 32%, #fff092 0%, #ff4d9b 47%, #19d6ff 100%)", overlayStyle: "opacity:.20;mix-blend-mode:screen;background:linear-gradient(90deg, rgba(255,0,130,.06), transparent 40%, rgba(0,230,255,.06));", animationType: "cyber", animationIntensity: "high", animationSpeed: 125, backgroundDim: 36, backgroundBlur: 0, panelOpacity: 88 },
+  lofi_night: { name: "lofi night", symbol: "音", description: "Quarto noturno, sensação acolhedora e estudo com trilha lenta.", recommendedAnimation: "stars", wallpaperTags: "room night city window cozy", wallpaperProvider: "auto", palette: { ink: "#2b2328", red: "#d27a6a", redDeep: "#865e8f", moss: "#7f7ca3", gold: "#efbd87" }, bodyBg: "#110d14", sceneBackground: "linear-gradient(180deg, rgba(17, 13, 20, 0.08), rgba(17, 13, 20, 0.52)), radial-gradient(circle at 73% 16%, rgba(255, 196, 145, 0.16) 0 10%, transparent 29%), linear-gradient(150deg, #41304c 0%, #1d1623 46%, #0d0a10 100%)", sunBackground: "radial-gradient(circle at 36% 32%, #ffe3b8 0%, #de9a72 47%, #7f77a5 100%)", overlayStyle: "opacity:.14;background:linear-gradient(180deg, rgba(255,255,255,.04), transparent 25%);", animationType: "stars", animationIntensity: "low", animationSpeed: 74, backgroundDim: 35, backgroundBlur: 0, panelOpacity: 92 },
+  winter_monastery: { name: "mosteiro de inverno", symbol: "雪", description: "Neve, pedra fria e silêncio contemplativo em tons claros.", recommendedAnimation: "snow", wallpaperTags: "snow temple monastery winter mountains", wallpaperProvider: "auto", palette: { ink: "#243039", red: "#7c9aaa", redDeep: "#5a7382", moss: "#7d8f95", gold: "#dbe8ef" }, bodyBg: "#0e1820", sceneBackground: "linear-gradient(180deg, rgba(14, 24, 32, 0.04), rgba(14, 24, 32, 0.42)), radial-gradient(circle at 73% 16%, rgba(255, 255, 255, 0.26) 0 9%, transparent 29%), linear-gradient(150deg, #5e7b8b 0%, #243542 46%, #10171d 100%)", sunBackground: "radial-gradient(circle at 36% 32%, #ffffff 0%, #d8e7ef 47%, #87a6b8 100%)", overlayStyle: "opacity:.12;background:linear-gradient(180deg, rgba(255,255,255,.08), transparent 26%);", animationType: "snow", animationIntensity: "medium", animationSpeed: 72, backgroundDim: 20, backgroundBlur: 0, panelOpacity: 95 }
+};
+
+const defaultState = {
+        date: todayKey(),
+        activeId: null,
+        searchEngine: "google",
+        settings: { ...defaultSettings },
+        tasks: [
+          { id: uid(), title: "Ler por 30 minutos", minutes: 30, remaining: 1800, done: false, repeat: true, running: false, lastTick: null, alarm: "default", alerted: false },
+          { id: uid(), title: "Revisar o conteúdo do dia", minutes: 25, remaining: 1500, done: false, repeat: true, running: false, lastTick: null, alarm: "default", alerted: false }
+        ]
+      };
+
+      const els = Object.fromEntries([
+        "clockTime","clockDate","searchForm","searchInput","searchEngine","taskForm","taskTitle",
+        "taskMinutes","taskRepeat","taskList","progressRing","progressText","clearDone","resetDay",
+        "focusName","timerTime","enso","toggleTimer","resetTimer","durationInput","activeAlarmLabel",
+        "editDialog","editForm","editTitle","editMinutes","editAlarm","editRepeat","cancelEdit","toast",
+        "openSettings","closeSettings","settingsDrawer","drawerBackdrop","wallpaperLayer","wallpaperBackdrop",
+        "wallpaperImage","defaultScene","themeOverlay","backgroundShade","fxCanvas","brandMon","themePreset","themeDescription","applyThemePreset","applyThemeWithWallpaper","cycleTheme","wallpaperUrl","applyWallpaperUrl",
+        "wallpaperFile","restoreBuiltin","wallpaperProvider","wallpaperRotate","wallpaperTags",
+        "adultMode","adultOptions","adultRating","randomWallpaper","wallpaperFit","wallpaperZoom",
+        "wallpaperZoomValue","wallpaperFocusX","wallpaperFocusXValue","wallpaperFocusY",
+        "wallpaperFocusYValue","resetWallpaperFraming","backgroundDim","backgroundDimValue",
+        "backgroundBlur","backgroundBlurValue",
+        "wallpaperStatus","wallpaperCredit","animationType","animationIntensity","animationSpeed",
+        "animationSpeedValue","alarmTone","alarmRepeats","alarmVolume","alarmVolumeValue","alarmFile",
+        "testAlarm","alarmFileStatus","notificationsEnabled","panelOpacity","panelOpacityValue",
+        "exportSettings","importSettings","resetEverything"
+      ].map(id => [id, document.getElementById(id)]));
+
+      let state = loadState();
+      let editingId = null;
+      let audioContext = null;
+      let autoWallpaperTimer = null;
+      let customWallpaperObjectUrl = "";
+      let customAlarmObjectUrl = "";
+      let animationFrame = 0;
+      let fx = { type: "", particles: [], columns: [], last: performance.now() };
+      const ctx = els.fxCanvas.getContext("2d", { alpha: true });
+
+      function normalizeTask(task) {
+        const minutes = Math.min(1440, Math.max(1, Number(task.minutes) || 25));
+        return {
+          id: task.id || uid(),
+          title: String(task.title || "Tarefa"),
+          minutes,
+          remaining: Number.isFinite(Number(task.remaining)) ? Math.max(0, Number(task.remaining)) : minutes * 60,
+          done: Boolean(task.done),
+          repeat: task.repeat !== false,
+          running: Boolean(task.running),
+          lastTick: task.lastTick || null,
+          alarm: task.alarm || "default",
+          alerted: Boolean(task.alerted)
+        };
+      }
+
+      function loadState() {
+        let parsed = null;
+        try {
+          parsed = JSON.parse(localStorage.getItem(STORAGE_KEY));
+          if (!parsed) {
+            for (const key of OLD_STORAGE_KEYS) {
+              parsed = JSON.parse(localStorage.getItem(key));
+              if (parsed) break;
+            }
+          }
+        } catch {}
+
+        if (!parsed || !Array.isArray(parsed.tasks)) return structuredClone(defaultState);
+
+        return {
+          ...structuredClone(defaultState),
+          ...parsed,
+          settings: { ...defaultSettings, ...(parsed.settings || {}) },
+          tasks: parsed.tasks.map(normalizeTask)
+        };
+      }
+
+      function saveState() {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        } catch (error) {
+          console.warn("Não foi possível salvar os dados:", error);
+          notify("O navegador não permitiu salvar todas as alterações.");
+        }
+      }
+
+      function openDb() {
+        return new Promise((resolve, reject) => {
+          const request = indexedDB.open(DB_NAME, 1);
+          request.onupgradeneeded = () => {
+            if (!request.result.objectStoreNames.contains(DB_STORE)) {
+              request.result.createObjectStore(DB_STORE);
+            }
+          };
+          request.onsuccess = () => resolve(request.result);
+          request.onerror = () => reject(request.error);
+        });
+      }
+
+      async function putAsset(key, blob) {
+        const db = await openDb();
+        await new Promise((resolve, reject) => {
+          const tx = db.transaction(DB_STORE, "readwrite");
+          tx.objectStore(DB_STORE).put(blob, key);
+          tx.oncomplete = resolve;
+          tx.onerror = () => reject(tx.error);
+        });
+        db.close();
+      }
+
+      async function getAsset(key) {
+        const db = await openDb();
+        const result = await new Promise((resolve, reject) => {
+          const tx = db.transaction(DB_STORE, "readonly");
+          const request = tx.objectStore(DB_STORE).get(key);
+          request.onsuccess = () => resolve(request.result || null);
+          request.onerror = () => reject(request.error);
+        });
+        db.close();
+        return result;
+      }
+
+      async function deleteAsset(key) {
+        const db = await openDb();
+        await new Promise((resolve, reject) => {
+          const tx = db.transaction(DB_STORE, "readwrite");
+          tx.objectStore(DB_STORE).delete(key);
+          tx.oncomplete = resolve;
+          tx.onerror = () => reject(tx.error);
+        });
+        db.close();
+      }
+
+      function handleNewDay() {
+        const now = todayKey();
+        if (state.date === now) return;
+
+        state.tasks = state.tasks
+          .filter(task => task.repeat || !task.done)
+          .map(task => task.repeat
+            ? { ...task, done: false, remaining: task.minutes * 60, running: false, lastTick: null, alerted: false }
+            : { ...task, running: false, lastTick: null, alerted: false });
+
+        state.date = now;
+        state.activeId = state.tasks[0]?.id ?? null;
+        saveState();
+      }
+
+      function activeTask() {
+        return state.tasks.find(task => task.id === state.activeId) || null;
+      }
+
+      function syncRunningTimers() {
+        const now = Date.now();
+        let changed = false;
+
+        state.tasks.forEach(task => {
+          if (!task.running || !task.lastTick) return;
+          const elapsed = Math.floor((now - task.lastTick) / 1000);
+          if (elapsed <= 0) return;
+
+          task.remaining = Math.max(0, task.remaining - elapsed);
+          task.lastTick = now;
+          changed = true;
+
+          if (task.remaining === 0) {
+            task.running = false;
+            task.lastTick = null;
+            task.done = true;
+            if (!task.alerted) {
+              task.alerted = true;
+              timerFinished(task);
+            }
+          }
+        });
+
+        if (changed) saveState();
+      }
+
+      async function timerFinished(task) {
+        notify(`Tempo concluído: ${task.title}`);
+        await playAlarm(resolveTaskAlarm(task));
+
+        if (state.settings.notificationsEnabled && "Notification" in window) {
+          if (Notification.permission === "granted") {
+            new Notification("静かな一日", { body: `Tempo concluído: ${task.title}` });
+          }
+        }
+      }
+
+      function updateClock() {
+        const now = new Date();
+        els.clockTime.textContent = `${pad(now.getHours())}:${pad(now.getMinutes())}`;
+        els.clockDate.textContent = new Intl.DateTimeFormat("pt-BR", {
+          weekday: "long", day: "2-digit", month: "long"
+        }).format(now);
+      }
+
+      function render() {
+        handleNewDay();
+        syncRunningTimers();
+
+        const completed = state.tasks.filter(task => task.done).length;
+        const percent = state.tasks.length ? Math.round((completed / state.tasks.length) * 100) : 0;
+        els.progressText.textContent = `${percent}%`;
+        els.progressRing.style.setProperty("--p", `${percent * 3.6}deg`);
+        els.searchEngine.value = state.searchEngine || "google";
+
+        if (!state.tasks.length) {
+          els.taskList.innerHTML = `
+            <li class="empty">
+              <div class="empty-mark">空</div>
+              Sua lista está vazia.<br>Adicione o primeiro passo do dia.
+            </li>`;
+        } else {
+          els.taskList.innerHTML = state.tasks.map(task => `
+            <li class="task ${task.done ? "done" : ""} ${task.id === state.activeId ? "active" : ""}" data-id="${task.id}">
+              <button class="check" data-action="toggle" aria-label="${task.done ? "Desmarcar" : "Concluir"}">${task.done ? "✓" : ""}</button>
+              <div class="task-copy" data-action="select" role="button" tabindex="0">
+                <div class="task-title">${escapeHtml(task.title)}</div>
+                <div class="task-meta">${task.minutes} min · ${task.repeat ? "repete diariamente" : "tarefa única"}${task.running ? " · em andamento" : ""} · ${alarmName(resolveTaskAlarm(task))}</div>
+              </div>
+              <div class="task-actions">
+                <button class="icon-btn play-btn" data-action="play" title="${task.running ? "Pausar" : "Iniciar"}">${task.running ? "Ⅱ" : "▶"}</button>
+                <button class="icon-btn" data-action="edit" title="Editar">✎</button>
+                <button class="icon-btn" data-action="delete" title="Excluir">×</button>
+              </div>
+            </li>
+          `).join("");
+        }
+
+        renderTimer();
+      }
+
+      function renderTimer() {
+        const task = activeTask();
+
+        if (!task) {
+          els.focusName.textContent = "Selecione uma tarefa";
+          els.timerTime.textContent = "25:00";
+          els.durationInput.value = 25;
+          els.toggleTimer.textContent = "Iniciar";
+          els.toggleTimer.disabled = true;
+          els.resetTimer.disabled = true;
+          els.durationInput.disabled = true;
+          els.activeAlarmLabel.textContent = `Alarme: ${alarmName(state.settings.alarmTone)}`;
+          els.enso.style.setProperty("--timer-p", "0deg");
+          return;
+        }
+
+        els.toggleTimer.disabled = false;
+        els.resetTimer.disabled = false;
+        els.durationInput.disabled = false;
+        els.focusName.textContent = task.title;
+        els.durationInput.value = task.minutes;
+        els.toggleTimer.textContent = task.running ? "Pausar" : "Iniciar";
+        els.activeAlarmLabel.textContent = `Alarme: ${alarmName(resolveTaskAlarm(task))}`;
+
+        const remaining = Math.max(0, task.remaining);
+        const mins = Math.floor(remaining / 60);
+        const secs = remaining % 60;
+        els.timerTime.textContent = `${pad(mins)}:${pad(secs)}`;
+
+        const total = Math.max(1, task.minutes * 60);
+        const progress = Math.min(1, Math.max(0, (total - remaining) / total));
+        els.enso.style.setProperty("--timer-p", `${progress * 360}deg`);
+        document.title = task.running ? `${els.timerTime.textContent} · ${task.title}` : "静かな一日 — Minha Página";
+      }
+
+      function selectTask(id) {
+        state.activeId = id;
+        saveState();
+        render();
+      }
+
+      function toggleTask(id) {
+        const task = state.tasks.find(t => t.id === id);
+        if (!task) return;
+        task.done = !task.done;
+        if (task.done) {
+          task.running = false;
+          task.lastTick = null;
+        } else {
+          task.alerted = false;
+        }
+        saveState();
+        render();
+      }
+
+      async function toggleTimer(id = state.activeId) {
+        const task = state.tasks.find(t => t.id === id);
+        if (!task) return;
+
+        await unlockAudio();
+
+        state.tasks.forEach(other => {
+          if (other.id !== task.id) {
+            other.running = false;
+            other.lastTick = null;
+          }
+        });
+
+        state.activeId = task.id;
+
+        if (task.remaining <= 0) task.remaining = task.minutes * 60;
+        task.running = !task.running;
+        task.lastTick = task.running ? Date.now() : null;
+        task.done = false;
+        task.alerted = false;
+        saveState();
+        render();
+      }
+
+      function resetTimer() {
+        const task = activeTask();
+        if (!task) return;
+        task.remaining = task.minutes * 60;
+        task.running = false;
+        task.lastTick = null;
+        task.alerted = false;
+        saveState();
+        render();
+      }
+
+      function editTask(id) {
+        const task = state.tasks.find(t => t.id === id);
+        if (!task) return;
+        editingId = id;
+        els.editTitle.value = task.title;
+        els.editMinutes.value = task.minutes;
+        els.editRepeat.checked = task.repeat;
+        els.editAlarm.value = task.alarm || "default";
+        els.editDialog.showModal();
+        setTimeout(() => els.editTitle.focus(), 50);
+      }
+
+      function removeTask(id) {
+        state.tasks = state.tasks.filter(t => t.id !== id);
+        if (state.activeId === id) state.activeId = state.tasks[0]?.id ?? null;
+        saveState();
+        render();
+      }
+
+      function notify(message) {
+        els.toast.textContent = message;
+        els.toast.classList.add("show");
+        clearTimeout(notify.timer);
+        notify.timer = setTimeout(() => els.toast.classList.remove("show"), 3200);
+      }
+
+      function escapeHtml(value) {
+        return String(value).replace(/[&<>"']/g, char => ({
+          "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;"
+        }[char]));
+      }
+
+      function alarmName(value) {
+        return ({
+          default: "padrão",
+          temple: "sino de templo",
+          soft: "suave",
+          digital: "digital",
+          urgent: "urgente",
+          custom: "personalizado"
+        })[value] || "padrão";
+      }
+
+      function resolveTaskAlarm(task) {
+        return !task || !task.alarm || task.alarm === "default"
+          ? state.settings.alarmTone
+          : task.alarm;
+      }
+
+      async function unlockAudio() {
+        try {
+          audioContext ||= new (window.AudioContext || window.webkitAudioContext)();
+          if (audioContext.state === "suspended") await audioContext.resume();
+
+          const oscillator = audioContext.createOscillator();
+          const gain = audioContext.createGain();
+          gain.gain.value = 0.00001;
+          oscillator.connect(gain).connect(audioContext.destination);
+          oscillator.start();
+          oscillator.stop(audioContext.currentTime + .01);
+        } catch {}
+      }
+
+      function synthTone(kind, volume) {
+        return new Promise(async resolve => {
+          await unlockAudio();
+          if (!audioContext) return resolve();
+
+          const now = audioContext.currentTime;
+          const master = audioContext.createGain();
+          master.gain.value = Math.max(0, Math.min(1, volume));
+          master.connect(audioContext.destination);
+
+          const note = (frequency, start, duration, type = "sine", gainValue = .24) => {
+            const osc = audioContext.createOscillator();
+            const gain = audioContext.createGain();
+            osc.type = type;
+            osc.frequency.setValueAtTime(frequency, now + start);
+            gain.gain.setValueAtTime(0.0001, now + start);
+            gain.gain.exponentialRampToValueAtTime(Math.max(.001, gainValue), now + start + .025);
+            gain.gain.exponentialRampToValueAtTime(.0001, now + start + duration);
+            osc.connect(gain).connect(master);
+            osc.start(now + start);
+            osc.stop(now + start + duration + .04);
+          };
+
+          let total = 1.2;
+          if (kind === "temple") {
+            note(220, 0, 2.4, "sine", .36);
+            note(440, .02, 1.8, "sine", .16);
+            note(660, .04, 1.2, "sine", .08);
+            total = 2.5;
+          } else if (kind === "soft") {
+            [523.25, 659.25, 783.99].forEach((freq, i) => note(freq, i * .22, .72, "sine", .18));
+            total = 1.25;
+          } else if (kind === "digital") {
+            [0, .2, .4].forEach(start => note(880, start, .12, "square", .12));
+            total = .8;
+          } else {
+            [0, .25, .5, .75].forEach((start, i) => note(i % 2 ? 740 : 980, start, .18, "sawtooth", .12));
+            total = 1.15;
+          }
+
+          setTimeout(resolve, total * 1000);
+        });
+      }
+
+      async function playCustomAlarm(volume) {
+        const blob = await getAsset("customAlarm");
+        if (!blob) {
+          notify("Escolha um arquivo de áudio personalizado nas configurações.");
+          return synthTone("temple", volume);
+        }
+
+        if (customAlarmObjectUrl) URL.revokeObjectURL(customAlarmObjectUrl);
+        customAlarmObjectUrl = URL.createObjectURL(blob);
+
+        return new Promise(resolve => {
+          const audio = new Audio(customAlarmObjectUrl);
+          audio.volume = Math.max(0, Math.min(1, volume));
+          audio.onended = resolve;
+          audio.onerror = () => {
+            notify("Não foi possível reproduzir o áudio personalizado.");
+            resolve();
+          };
+          audio.play().catch(() => {
+            notify("O navegador bloqueou o áudio. Clique em “Testar alarme” uma vez.");
+            resolve();
+          });
+        });
+      }
+
+      async function playAlarm(kind = state.settings.alarmTone) {
+        const repeats = Math.max(1, Number(state.settings.alarmRepeats) || 1);
+        const volume = (Number(state.settings.alarmVolume) || 0) / 100;
+
+        for (let i = 0; i < repeats; i++) {
+          if (kind === "custom") await playCustomAlarm(volume);
+          else await synthTone(kind, volume);
+          if (i < repeats - 1) await new Promise(resolve => setTimeout(resolve, 350));
+        }
+      }
+
+      function openSettings() {
+        els.settingsDrawer.classList.add("open");
+        els.drawerBackdrop.classList.add("open");
+        document.body.style.overflow = "hidden";
+      }
+
+      function closeSettings() {
+        els.settingsDrawer.classList.remove("open");
+        els.drawerBackdrop.classList.remove("open");
+        document.body.style.overflow = "";
+      }
+
+      
+function themeList() {
+  return Object.keys(THEME_PRESETS);
+}
+
+function currentTheme() {
+  return THEME_PRESETS[state.settings.themePreset] || THEME_PRESETS.japanese;
+}
+
+function themeDescriptionHtml(theme) {
+  return `
+    <strong>${escapeHtml(theme.name)}</strong>
+    ${escapeHtml(theme.description)}
+    <small>Animação sugerida: ${escapeHtml(theme.recommendedAnimation)} · tags sugeridas: ${escapeHtml(theme.wallpaperTags)}</small>
+    <div class="theme-pills">
+      <span class="theme-pill">animação: ${escapeHtml(theme.animationType)}</span>
+      <span class="theme-pill">intensidade: ${escapeHtml(theme.animationIntensity)}</span>
+      <span class="theme-pill">opacidade: ${theme.panelOpacity}%</span>
+    </div>
+    <div class="theme-swatches">
+      <span class="theme-swatch" style="background:${theme.palette.red}"></span>
+      <span class="theme-swatch" style="background:${theme.palette.redDeep}"></span>
+      <span class="theme-swatch" style="background:${theme.palette.moss}"></span>
+      <span class="theme-swatch" style="background:${theme.palette.gold}"></span>
+    </div>
+  `;
+}
+
+function updateThemeDescription() {
+  const theme = THEME_PRESETS[els.themePreset.value] || currentTheme();
+  els.themeDescription.innerHTML = themeDescriptionHtml(theme);
+}
+
+function applyThemePalette() {
+  const theme = currentTheme();
+  const root = document.documentElement;
+  root.style.setProperty("--ink", theme.palette.ink);
+  root.style.setProperty("--red", theme.palette.red);
+  root.style.setProperty("--red-deep", theme.palette.redDeep);
+  root.style.setProperty("--moss", theme.palette.moss);
+  root.style.setProperty("--gold", theme.palette.gold);
+  document.body.style.background = theme.bodyBg || "#0d1513";
+  els.defaultScene.style.background = theme.sceneBackground || "";
+  const sun = document.querySelector(".sun");
+  if (sun) sun.style.background = theme.sunBackground || "";
+  els.themeOverlay.style.cssText = "opacity:0;background:transparent;";
+  if (theme.overlayStyle) {
+    els.themeOverlay.style.cssText = theme.overlayStyle;
+  }
+  if (els.brandMon) els.brandMon.textContent = theme.symbol || "日";
+}
+
+function setThemePreset(name, { fetchWallpaper = false, notifyUser = true } = {}) {
+  const theme = THEME_PRESETS[name];
+  if (!theme) return;
+  state.settings.themePreset = name;
+  state.settings.animationType = theme.animationType;
+  state.settings.animationIntensity = theme.animationIntensity;
+  state.settings.animationSpeed = theme.animationSpeed;
+  state.settings.backgroundDim = theme.backgroundDim;
+  state.settings.backgroundBlur = theme.backgroundBlur;
+  state.settings.panelOpacity = theme.panelOpacity;
+  state.settings.wallpaperProvider = theme.wallpaperProvider || state.settings.wallpaperProvider;
+  state.settings.wallpaperTags = theme.wallpaperTags || state.settings.wallpaperTags;
+  saveState();
+  bindSettingsToInputs();
+  applyThemePalette();
+  applyWallpaper();
+  resetFx();
+  renderTimer();
+  if (notifyUser) notify(`Tema aplicado: ${theme.name}`);
+  if (fetchWallpaper) fetchRandomWallpaper(true);
+}
+
+function bindSettingsToInputs() {
+        const s = state.settings;
+        els.wallpaperUrl.value = s.wallpaperMode === "url" ? s.wallpaperUrl : "";
+        els.themePreset.value = s.themePreset || "japanese";
+        els.wallpaperProvider.value = s.wallpaperProvider;
+        els.wallpaperRotate.value = s.wallpaperRotate;
+        els.wallpaperTags.value = s.wallpaperTags;
+        els.wallpaperFit.value = s.wallpaperFit;
+        els.wallpaperZoom.value = s.wallpaperZoom;
+        els.wallpaperFocusX.value = s.wallpaperFocusX;
+        els.wallpaperFocusY.value = s.wallpaperFocusY;
+        els.adultMode.checked = Boolean(s.adultMode);
+        els.adultRating.value = s.adultRating;
+        els.adultOptions.classList.toggle("hidden", !s.adultMode);
+        els.backgroundDim.value = s.backgroundDim;
+        els.backgroundBlur.value = s.backgroundBlur;
+        els.animationType.value = s.animationType;
+        els.animationIntensity.value = s.animationIntensity;
+        els.animationSpeed.value = s.animationSpeed;
+        els.alarmTone.value = s.alarmTone;
+        els.alarmRepeats.value = String(s.alarmRepeats);
+        els.alarmVolume.value = s.alarmVolume;
+        els.notificationsEnabled.checked = s.notificationsEnabled;
+        els.panelOpacity.value = s.panelOpacity;
+        updateSettingLabels();
+        updateCredit();
+        updateThemeDescription();
+        els.alarmFileStatus.textContent = s.customAlarmName
+          ? `Arquivo selecionado: ${s.customAlarmName}`
+          : "Nenhum áudio personalizado selecionado.";
+      }
+
+      function updateSettingLabels() {
+        els.wallpaperZoomValue.textContent = `${state.settings.wallpaperZoom}%`;
+        els.wallpaperFocusXValue.textContent = `${state.settings.wallpaperFocusX}%`;
+        els.wallpaperFocusYValue.textContent = `${state.settings.wallpaperFocusY}%`;
+        els.backgroundDimValue.textContent = `${state.settings.backgroundDim}%`;
+        els.backgroundBlurValue.textContent = `${state.settings.backgroundBlur} px`;
+        els.animationSpeedValue.textContent = `${state.settings.animationSpeed}%`;
+        els.alarmVolumeValue.textContent = `${state.settings.alarmVolume}%`;
+        els.panelOpacityValue.textContent = `${state.settings.panelOpacity}%`;
+      }
+
+      function updateCredit() {
+        if (state.settings.wallpaperCreditUrl) {
+          els.wallpaperCredit.href = state.settings.wallpaperCreditUrl;
+          els.wallpaperCredit.classList.add("visible");
+        } else {
+          els.wallpaperCredit.removeAttribute("href");
+          els.wallpaperCredit.classList.remove("visible");
+        }
+      }
+
+      function applyWallpaperLayout() {
+        const s = state.settings;
+        const image = els.wallpaperImage;
+        const imageRatio = image.naturalWidth && image.naturalHeight
+          ? image.naturalWidth / image.naturalHeight
+          : 16 / 9;
+        const viewportRatio = Math.max(1, innerWidth) / Math.max(1, innerHeight);
+
+        let fit = s.wallpaperFit;
+        if (fit === "smart") {
+          const closeToViewport = imageRatio >= viewportRatio * .78 && imageRatio <= viewportRatio * 1.35;
+          fit = closeToViewport ? "cover" : "contain";
+        }
+
+        image.style.objectFit = fit === "stretch" ? "fill" : fit;
+        image.style.objectPosition = `${s.wallpaperFocusX}% ${s.wallpaperFocusY}%`;
+        image.style.transform = `scale(${Math.max(.7, Math.min(1.8, s.wallpaperZoom / 100))})`;
+        image.style.transformOrigin = `${s.wallpaperFocusX}% ${s.wallpaperFocusY}%`;
+        els.wallpaperLayer.classList.toggle("soft-fill", fit === "contain");
+      }
+
+      async function applyWallpaper() {
+        const s = state.settings;
+        applyThemePalette();
+        document.documentElement.style.setProperty("--panel-opacity", Math.max(.58, Math.min(1, s.panelOpacity / 100)));
+        els.backgroundShade.style.background = `rgba(5, 9, 7, ${s.backgroundDim / 100})`;
+        els.backgroundShade.style.backdropFilter = `blur(${s.backgroundBlur}px)`;
+        applyWallpaperLayout();
+
+        if (s.wallpaperMode === "builtin") {
+          els.defaultScene.classList.remove("hidden");
+          els.wallpaperLayer.classList.remove("visible");
+          els.wallpaperImage.removeAttribute("src");
+          els.wallpaperBackdrop.style.backgroundImage = "";
+        } else if (s.wallpaperMode === "upload") {
+          try {
+            const blob = await getAsset("customWallpaper");
+            if (!blob) throw new Error("Arquivo não encontrado");
+            if (customWallpaperObjectUrl) URL.revokeObjectURL(customWallpaperObjectUrl);
+            customWallpaperObjectUrl = URL.createObjectURL(blob);
+            setWallpaperImage(customWallpaperObjectUrl);
+          } catch {
+            s.wallpaperMode = "builtin";
+            saveState();
+            els.defaultScene.classList.remove("hidden");
+            els.wallpaperLayer.classList.remove("visible");
+          }
+        } else if (s.wallpaperUrl) {
+          setWallpaperImage(s.wallpaperUrl);
+        }
+
+        updateSettingLabels();
+        updateCredit();
+      }
+
+      function setWallpaperImage(url) {
+        const safeUrl = String(url);
+        els.wallpaperImage.onload = () => {
+          els.wallpaperBackdrop.style.backgroundImage = `url("${safeUrl.replace(/"/g, "%22")}")`;
+          applyWallpaperLayout();
+          els.defaultScene.classList.add("hidden");
+          requestAnimationFrame(() => els.wallpaperLayer.classList.add("visible"));
+        };
+        els.wallpaperImage.onerror = () => {
+          els.wallpaperStatus.textContent = "A imagem não pôde ser carregada.";
+          notify("Não foi possível carregar o wallpaper.");
+        };
+        els.wallpaperImage.src = safeUrl;
+      }
+
+      function saveVisualSettings() {
+        const s = state.settings;
+        s.themePreset = els.themePreset.value;
+        s.wallpaperProvider = els.wallpaperProvider.value;
+        s.wallpaperRotate = els.wallpaperRotate.value;
+        s.wallpaperTags = els.wallpaperTags.value.trim();
+        s.wallpaperFit = els.wallpaperFit.value;
+        s.wallpaperZoom = Number(els.wallpaperZoom.value);
+        s.wallpaperFocusX = Number(els.wallpaperFocusX.value);
+        s.wallpaperFocusY = Number(els.wallpaperFocusY.value);
+        s.adultRating = els.adultRating.value;
+        s.backgroundDim = Number(els.backgroundDim.value);
+        s.backgroundBlur = Number(els.backgroundBlur.value);
+        s.animationType = els.animationType.value;
+        s.animationIntensity = els.animationIntensity.value;
+        s.animationSpeed = Number(els.animationSpeed.value);
+        s.alarmTone = els.alarmTone.value;
+        s.alarmRepeats = Number(els.alarmRepeats.value);
+        s.alarmVolume = Number(els.alarmVolume.value);
+        s.notificationsEnabled = els.notificationsEnabled.checked;
+        s.panelOpacity = Number(els.panelOpacity.value);
+        saveState();
+        applyWallpaper();
+        resetFx();
+        configureAutoWallpaper();
+        renderTimer();
+      }
+
+      function normalizeRemoteUrl(url) {
+        if (!url) return "";
+        if (url.startsWith("//")) return `https:${url}`;
+        return url.replace(/^http:\/\//i, "https://");
+      }
+
+      async function fetchWithTimeout(url, timeout = 12000) {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), timeout);
+        try {
+          const response = await fetch(url, {
+            signal: controller.signal,
+            headers: { "Accept": "application/json" },
+            cache: "no-store"
+          });
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          return await response.json();
+        } finally {
+          clearTimeout(timer);
+        }
+      }
+
+      const blockedMinorTags = new Set([
+        "loli", "lolicon", "shota", "shotacon", "child", "children", "underage",
+        "toddler", "kindergarten", "elementary_school_student", "middle_school_student",
+        "young_girl", "young_boy"
+      ]);
+
+      function normalizedUserTags() {
+        const tokens = String(state.settings.wallpaperTags || "scenery")
+          .split(/\s+/)
+          .map(tag => tag.trim())
+          .filter(Boolean)
+          .filter(tag => !/^[-]?rating:/i.test(tag));
+
+        const forbidden = tokens.find(tag => blockedMinorTags.has(tag.toLowerCase().replace(/^-/, "")));
+        if (forbidden) throw new Error(`Tag não permitida: ${forbidden}`);
+        return tokens;
+      }
+
+      function postHasBlockedMinorTag(post) {
+        const tags = String(post.tags || "")
+          .split(/\s+/)
+          .map(tag => tag.toLowerCase());
+        return tags.some(tag => blockedMinorTags.has(tag));
+      }
+
+      function chooseBestWallpaper(posts) {
+        const viewportRatio = Math.max(1, innerWidth) / Math.max(1, innerHeight);
+        const valid = posts.filter(post => {
+          const imageUrl = post.file_url || post.sample_url;
+          if (!imageUrl || postHasBlockedMinorTag(post)) return false;
+          if (!state.settings.adultMode && String(post.rating || "").toLowerCase() !== "safe") return false;
+          return Number(post.width || 0) >= 900 && Number(post.height || 0) >= 600;
+        });
+
+        if (!valid.length) throw new Error("Nenhuma imagem compatível encontrada");
+
+        const scored = valid.map(post => {
+          const width = Number(post.width || 1);
+          const height = Number(post.height || 1);
+          const ratio = width / height;
+          const ratioPenalty = Math.abs(Math.log(ratio / viewportRatio));
+          const resolutionBonus = Math.min(2.5, (width * height) / (1920 * 1080));
+          return { post, score: resolutionBonus - ratioPenalty * 2.6 };
+        }).sort((a, b) => b.score - a.score);
+
+        const pool = scored.slice(0, Math.min(18, scored.length));
+        return pool[Math.floor(Math.random() * pool.length)].post;
+      }
+
+      async function fetchKonachanWallpaper() {
+        const adult = Boolean(state.settings.adultMode);
+        let rating = "safe";
+        if (adult) {
+          rating = state.settings.adultRating === "mixed"
+            ? (Math.random() < .5 ? "questionable" : "explicit")
+            : state.settings.adultRating;
+        }
+
+        const negativeTags = [
+          "-loli", "-lolicon", "-shota", "-shotacon", "-child", "-underage",
+          "-toddler", "-elementary_school_student", "-middle_school_student"
+        ];
+        const tags = [`rating:${rating}`, ...normalizedUserTags(), ...negativeTags].join(" ").trim();
+        const page = Math.floor(Math.random() * (adult ? 45 : 80)) + 1;
+        const host = adult ? "https://konachan.com" : "https://konachan.net";
+        const url = `${host}/post.json?limit=100&page=${page}&tags=${encodeURIComponent(tags)}`;
+        const posts = await fetchWithTimeout(url);
+        if (!Array.isArray(posts) || !posts.length) throw new Error("Nenhum resultado no Konachan");
+
+        const post = chooseBestWallpaper(posts);
+        const imageUrl = normalizeRemoteUrl(post.file_url || post.sample_url);
+        if (!imageUrl) throw new Error("Imagem inválida");
+
+        return {
+          url: imageUrl,
+          credit: post.id ? `${host}/post/show/${post.id}` : `${host}/`,
+          provider: adult ? `Konachan 18+ (${rating})` : "Konachan SFW"
+        };
+      }
+
+      async function fetchWaifuWallpaper() {
+        const adult = Boolean(state.settings.adultMode);
+        const params = new URLSearchParams({
+          IsNsfw: adult ? "True" : "False",
+          Orientation: "Landscape",
+          PageSize: "40",
+          OrderBy: "Random",
+          Width: ">=1280",
+          Height: ">=720"
+        });
+
+        const data = await fetchWithTimeout(`https://api.waifu.im/images?${params}`);
+        const items = Array.isArray(data) ? data : (data.items || data.images || []);
+
+        const validItems = items.filter(item => {
+          const imageUrl = item.url || item.image_url || item.file;
+          if (!imageUrl) return false;
+
+          if (adult && item.isNsfw === false) return false;
+          if (!adult && item.isNsfw === true) return false;
+
+          const tags = Array.isArray(item.tags)
+            ? item.tags.map(tag => String(tag.slug || tag.name || "").toLowerCase())
+            : [];
+
+          return !tags.some(tag => blockedMinorTags.has(tag));
+        });
+
+        if (!validItems.length) {
+          throw new Error(adult
+            ? "Nenhum resultado adulto compatível no Waifu.im"
+            : "Nenhum resultado seguro no Waifu.im");
+        }
+
+        const item = validItems[Math.floor(Math.random() * validItems.length)];
+        const imageUrl = normalizeRemoteUrl(item.url || item.image_url || item.file);
+        if (!imageUrl) throw new Error("Imagem inválida");
+
+        return {
+          url: imageUrl,
+          credit: item.source || item.sourceUrl || item.url || "https://www.waifu.im/",
+          provider: adult ? "Waifu.im 18+" : "Waifu.im SFW"
+        };
+      }
+
+      async function fetchNekosWallpaper() {
+        const data = await fetchWithTimeout("https://nekos.best/api/v2/waifu?amount=20");
+        const items = data.results || data.items || [];
+        if (!items.length) throw new Error("Nenhum resultado no Nekos.best");
+
+        const landscape = items.filter(item => {
+          const dimensions = item.dimensions || {};
+          return Number(dimensions.width || 0) >= Number(dimensions.height || 0);
+        });
+        const item = (landscape.length ? landscape : items)[Math.floor(Math.random() * (landscape.length || items.length))];
+        const imageUrl = normalizeRemoteUrl(item.url);
+        if (!imageUrl) throw new Error("Imagem inválida");
+
+        return {
+          url: imageUrl,
+          credit: item.source_url || item.artist_href || item.url || "https://nekos.best/",
+          provider: "Nekos.best"
+        };
+      }
+
+      async function fetchRandomWallpaper(showMessages = true) {
+        if (showMessages) {
+          els.wallpaperStatus.textContent = state.settings.adultMode
+            ? "Buscando um wallpaper adulto..."
+            : "Buscando uma imagem segura...";
+          els.randomWallpaper.disabled = true;
+        }
+
+        const selected = state.settings.wallpaperProvider;
+        let order;
+
+        if (state.settings.adultMode) {
+          if (selected === "konachan") order = ["konachan", "waifu"];
+          else if (selected === "waifu") order = ["waifu", "konachan"];
+          else order = ["waifu", "konachan"];
+        } else {
+          order = selected === "auto"
+            ? ["konachan", "waifu", "nekos"]
+            : [selected];
+        }
+
+        let lastError = null;
+        for (const provider of order) {
+          try {
+            let result;
+            if (provider === "konachan") result = await fetchKonachanWallpaper();
+            if (provider === "waifu") result = await fetchWaifuWallpaper();
+            if (provider === "nekos") result = await fetchNekosWallpaper();
+            if (!result) continue;
+
+            state.settings.wallpaperMode = "remote";
+            state.settings.wallpaperUrl = result.url;
+            state.settings.wallpaperCreditUrl = result.credit;
+            state.settings.lastWallpaperFetch = new Date().toISOString();
+            state.settings.lastWallpaperDay = todayKey();
+            saveState();
+            await applyWallpaper();
+            if (showMessages) {
+              els.wallpaperStatus.textContent = `Wallpaper carregado por ${result.provider}.`;
+              notify(`Novo wallpaper: ${result.provider}`);
+            }
+            return true;
+          } catch (error) {
+            console.warn(`Falha em ${provider}:`, error);
+            lastError = error;
+          }
+        }
+
+        if (showMessages) {
+          els.wallpaperStatus.textContent = state.settings.adultMode
+            ? "Nenhuma fonte adulta respondeu. Tente novamente; o Konachan pode ser bloqueado pelo navegador ao abrir via file://."
+            : "As fontes automáticas não responderam. Tente novamente ou use uma URL/arquivo.";
+          notify("Não foi possível buscar um wallpaper agora.");
+        }
+        console.warn(lastError);
+        return false;
+      }
+
+      function configureAutoWallpaper() {
+        clearInterval(autoWallpaperTimer);
+        autoWallpaperTimer = null;
+        const mode = state.settings.wallpaperRotate;
+
+        if (["15", "30", "60"].includes(mode)) {
+          autoWallpaperTimer = setInterval(() => fetchRandomWallpaper(false), Number(mode) * 60 * 1000);
+        }
+      }
+
+      async function maybeFetchWallpaperAtStartup() {
+        const mode = state.settings.wallpaperRotate;
+        if (mode === "launch") await fetchRandomWallpaper(false);
+        if (mode === "daily" && state.settings.lastWallpaperDay !== todayKey()) {
+          await fetchRandomWallpaper(false);
+        }
+      }
+
+      function resizeCanvas() {
+        const ratio = Math.min(2, window.devicePixelRatio || 1);
+        els.fxCanvas.width = Math.floor(innerWidth * ratio);
+        els.fxCanvas.height = Math.floor(innerHeight * ratio);
+        els.fxCanvas.style.width = `${innerWidth}px`;
+        els.fxCanvas.style.height = `${innerHeight}px`;
+        ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+        resetFx();
+      }
+
+      function particleCount(base) {
+        const multiplier = state.settings.animationIntensity === "low" ? .55
+          : state.settings.animationIntensity === "high" ? 1.75 : 1;
+        return Math.max(8, Math.floor(base * multiplier));
+      }
+
+      function resetFx() {
+        fx.type = state.settings.animationType;
+        fx.particles = [];
+        fx.columns = [];
+        fx.last = performance.now();
+        const w = innerWidth;
+        const h = innerHeight;
+
+        if (fx.type === "sakura") {
+          fx.particles = Array.from({ length: particleCount(34) }, () => ({
+            x: Math.random() * w, y: Math.random() * h, size: 3 + Math.random() * 7,
+            vx: .2 + Math.random() * .65, vy: .35 + Math.random() * 1.1,
+            rot: Math.random() * Math.PI * 2, vr: -.03 + Math.random() * .06
+          }));
+        } else if (fx.type === "rain") {
+          fx.particles = Array.from({ length: particleCount(120) }, () => ({
+            x: Math.random() * w, y: Math.random() * h, len: 10 + Math.random() * 26,
+            vy: 6 + Math.random() * 11
+          }));
+        } else if (fx.type === "fireflies") {
+          fx.particles = Array.from({ length: particleCount(42) }, () => ({
+            x: Math.random() * w, y: Math.random() * h, r: 1 + Math.random() * 2.3,
+            phase: Math.random() * Math.PI * 2, vx: -.25 + Math.random() * .5,
+            vy: -.18 + Math.random() * .36
+          }));
+        } else if (fx.type === "matrix") {
+          const fontSize = state.settings.animationIntensity === "high" ? 13 : 16;
+          fx.columns = Array.from({ length: Math.ceil(w / fontSize) }, (_, i) => ({
+            x: i * fontSize, y: Math.random() * -h, speed: 1.7 + Math.random() * 3.2,
+            fontSize
+          }));
+        } else if (fx.type === "manga") {
+          fx.particles = Array.from({ length: particleCount(52) }, (_, i) => ({
+            angle: (i / particleCount(52)) * Math.PI * 2 + Math.random() * .12,
+            width: .8 + Math.random() * 2.2,
+            offset: Math.random() * 70
+          }));
+        } else if (fx.type === "snow") {
+          fx.particles = Array.from({ length: particleCount(90) }, () => ({
+            x: Math.random() * w, y: Math.random() * h, r: 1 + Math.random() * 3,
+            vx: -.25 + Math.random() * .5, vy: .7 + Math.random() * 1.6,
+            phase: Math.random() * Math.PI * 2
+          }));
+        } else if (fx.type === "stars") {
+          fx.particles = Array.from({ length: particleCount(80) }, () => ({
+            x: Math.random() * w, y: Math.random() * h, r: .6 + Math.random() * 1.9,
+            phase: Math.random() * Math.PI * 2, glow: 12 + Math.random() * 28
+          }));
+        } else if (fx.type === "embers") {
+          fx.particles = Array.from({ length: particleCount(65) }, () => ({
+            x: Math.random() * w, y: Math.random() * h, r: 1 + Math.random() * 3,
+            vx: -.5 + Math.random() * 1, vy: -.4 - Math.random() * 1.1,
+            hue: 25 + Math.random() * 35, phase: Math.random() * Math.PI * 2
+          }));
+        } else if (fx.type === "glitch") {
+          fx.particles = Array.from({ length: particleCount(24) }, () => ({
+            y: Math.random() * h, h: 1 + Math.random() * 5,
+            x: Math.random() * w, w: w * (.25 + Math.random() * .6),
+            dx: -30 + Math.random() * 60, alpha: .05 + Math.random() * .12
+          }));
+        } else if (fx.type === "bubbles") {
+          fx.particles = Array.from({ length: particleCount(40) }, () => ({
+            x: Math.random() * w, y: Math.random() * h, r: 4 + Math.random() * 22,
+            vy: .5 + Math.random() * 1.4, phase: Math.random() * Math.PI * 2, drift: .4 + Math.random() * .9
+          }));
+        } else if (fx.type === "orbits") {
+          const cx = w / 2, cy = h / 2;
+          fx.particles = Array.from({ length: particleCount(28) }, () => ({
+            cx, cy,
+            radiusX: 60 + Math.random() * (w * .34),
+            radiusY: 40 + Math.random() * (h * .24),
+            angle: Math.random() * Math.PI * 2,
+            speed: .002 + Math.random() * .005,
+            size: 1 + Math.random() * 3
+          }));
+        }
+      }
+
+      function drawFx(now) {
+        animationFrame = requestAnimationFrame(drawFx);
+        const w = innerWidth;
+        const h = innerHeight;
+        const dt = Math.min(2.5, (now - fx.last) / 16.67);
+        fx.last = now;
+        const speed = (state.settings.animationSpeed / 100) * dt;
+
+        ctx.clearRect(0, 0, w, h);
+        if (fx.type === "none") return;
+
+        if (fx.type === "sakura") {
+          ctx.fillStyle = "rgba(255, 190, 196, .72)";
+          fx.particles.forEach(p => {
+            p.x += p.vx * speed;
+            p.y += p.vy * speed;
+            p.rot += p.vr * speed;
+            if (p.y > h + 20 || p.x > w + 30) { p.x = -20; p.y = -20 - Math.random() * h * .3; }
+            ctx.save();
+            ctx.translate(p.x, p.y);
+            ctx.rotate(p.rot);
+            ctx.beginPath();
+            ctx.ellipse(0, 0, p.size, p.size * .48, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+          });
+        } else if (fx.type === "rain") {
+          ctx.strokeStyle = "rgba(190, 222, 238, .34)";
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          fx.particles.forEach(p => {
+            p.y += p.vy * speed;
+            p.x -= 1.8 * speed;
+            if (p.y > h + p.len) { p.y = -p.len; p.x = Math.random() * (w + 100); }
+            ctx.moveTo(p.x, p.y);
+            ctx.lineTo(p.x - p.len * .25, p.y + p.len);
+          });
+          ctx.stroke();
+        } else if (fx.type === "fireflies") {
+          fx.particles.forEach(p => {
+            p.x += p.vx * speed;
+            p.y += p.vy * speed;
+            p.phase += .025 * speed;
+            if (p.x < -10) p.x = w + 10;
+            if (p.x > w + 10) p.x = -10;
+            if (p.y < -10) p.y = h + 10;
+            if (p.y > h + 10) p.y = -10;
+            const alpha = .18 + (Math.sin(p.phase) + 1) * .22;
+            const gradient = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r * 7);
+            gradient.addColorStop(0, `rgba(255, 226, 116, ${alpha})`);
+            gradient.addColorStop(1, "rgba(255, 226, 116, 0)");
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.r * 7, 0, Math.PI * 2);
+            ctx.fill();
+          });
+        } else if (fx.type === "matrix") {
+          ctx.fillStyle = "rgba(2, 12, 7, .12)";
+          ctx.fillRect(0, 0, w, h);
+          ctx.textBaseline = "top";
+          fx.columns.forEach(col => {
+            col.y += col.speed * speed;
+            if (col.y > h + 120) col.y = -Math.random() * h;
+            const chars = "01アイウエオカキクケコｼﾂﾅﾆﾇﾈﾉ";
+            for (let i = 0; i < 12; i++) {
+              const y = col.y - i * col.fontSize;
+              const alpha = Math.max(0, 1 - i / 12);
+              ctx.fillStyle = i === 0 ? `rgba(220,255,230,${alpha})` : `rgba(70,255,135,${alpha * .62})`;
+              ctx.font = `${col.fontSize}px monospace`;
+              ctx.fillText(chars[Math.floor(Math.random() * chars.length)], col.x, y);
+            }
+          });
+        } else if (fx.type === "manga") {
+          const cx = w * .5;
+          const cy = h * .47;
+          const pulse = 1 + Math.sin(now * .002 * state.settings.animationSpeed / 100) * .035;
+          ctx.save();
+          ctx.translate(cx, cy);
+          ctx.scale(pulse, pulse);
+          fx.particles.forEach(line => {
+            const inner = 90 + line.offset;
+            const outer = Math.hypot(w, h);
+            ctx.strokeStyle = `rgba(255,255,255,${.09 + line.width * .018})`;
+            ctx.lineWidth = line.width;
+            ctx.beginPath();
+            ctx.moveTo(Math.cos(line.angle) * inner, Math.sin(line.angle) * inner);
+            ctx.lineTo(Math.cos(line.angle) * outer, Math.sin(line.angle) * outer);
+            ctx.stroke();
+          });
+          ctx.restore();
+
+          ctx.fillStyle = "rgba(255,255,255,.08)";
+          const gap = state.settings.animationIntensity === "high" ? 13 : 18;
+          const offset = (now * .015 * state.settings.animationSpeed / 100) % gap;
+          for (let y = -gap; y < h + gap; y += gap) {
+            for (let x = -gap; x < w + gap; x += gap) {
+              ctx.beginPath();
+              ctx.arc(x + offset, y + offset, 1.2, 0, Math.PI * 2);
+              ctx.fill();
+            }
+          }
+        } else if (fx.type === "cyber") {
+          const horizon = h * .52;
+          const motion = (now * .035 * state.settings.animationSpeed / 100) % 42;
+          ctx.strokeStyle = "rgba(63, 228, 255, .2)";
+          ctx.lineWidth = 1;
+
+          for (let i = -14; i <= 14; i++) {
+            ctx.beginPath();
+            ctx.moveTo(w / 2, horizon);
+            ctx.lineTo(w / 2 + i * w * .12, h);
+            ctx.stroke();
+          }
+
+          for (let i = 0; i < 18; i++) {
+            const t = ((i * 42 + motion) / (18 * 42));
+            const eased = t * t;
+            const y = horizon + eased * (h - horizon);
+            ctx.globalAlpha = Math.min(1, .2 + t);
+            ctx.beginPath();
+            ctx.moveTo(0, y);
+            ctx.lineTo(w, y);
+            ctx.stroke();
+          }
+          ctx.globalAlpha = 1;
+
+          const glow = ctx.createLinearGradient(0, horizon - 20, 0, horizon + 100);
+          glow.addColorStop(0, "rgba(255,45,180,.18)");
+          glow.addColorStop(1, "rgba(255,45,180,0)");
+          ctx.fillStyle = glow;
+          ctx.fillRect(0, horizon - 20, w, 120);
+        } else if (fx.type === "snow") {
+          ctx.fillStyle = "rgba(255,255,255,.8)";
+          fx.particles.forEach(p => {
+            p.phase += .02 * speed;
+            p.x += (Math.sin(p.phase) * .5 + p.vx) * speed;
+            p.y += p.vy * speed;
+            if (p.y > h + 10) { p.y = -10; p.x = Math.random() * w; }
+            if (p.x < -20) p.x = w + 10;
+            if (p.x > w + 20) p.x = -10;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+            ctx.fill();
+          });
+        } else if (fx.type === "stars") {
+          fx.particles.forEach(p => {
+            p.phase += .018 * speed;
+            const alpha = .18 + (Math.sin(p.phase) + 1) * .34;
+            const gradient = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.glow);
+            gradient.addColorStop(0, `rgba(255,255,255,${alpha})`);
+            gradient.addColorStop(1, "rgba(255,255,255,0)");
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.glow, 0, Math.PI * 2);
+            ctx.fill();
+          });
+        } else if (fx.type === "embers") {
+          fx.particles.forEach(p => {
+            p.phase += .025 * speed;
+            p.x += (Math.sin(p.phase) * .4 + p.vx) * speed;
+            p.y += p.vy * speed;
+            if (p.y < -20) { p.y = h + 20; p.x = Math.random() * w; }
+            if (p.x < -20) p.x = w + 10;
+            if (p.x > w + 20) p.x = -10;
+            ctx.fillStyle = `hsla(${p.hue}, 95%, 62%, ${.18 + (Math.sin(p.phase) + 1) * .22})`;
+            ctx.beginPath();
+            ctx.ellipse(p.x, p.y, p.r * 1.6, p.r, p.phase, 0, Math.PI * 2);
+            ctx.fill();
+          });
+        } else if (fx.type === "glitch") {
+          ctx.fillStyle = "rgba(255,255,255,.02)";
+          ctx.fillRect(0, 0, w, h);
+          fx.particles.forEach((band, idx) => {
+            if (Math.random() < .03) {
+              band.y = Math.random() * h;
+              band.h = 1 + Math.random() * 7;
+              band.x = Math.random() * w;
+              band.w = w * (.15 + Math.random() * .85);
+              band.dx = -50 + Math.random() * 100;
+              band.alpha = .05 + Math.random() * .16;
+            }
+            ctx.fillStyle = idx % 2 ? `rgba(125,255,185,${band.alpha})` : `rgba(255,255,255,${band.alpha * .55})`;
+            ctx.fillRect(band.x + Math.sin(now * .008 + idx) * band.dx, band.y, band.w, band.h);
+          });
+          ctx.strokeStyle = "rgba(125,255,185,.08)";
+          for (let i = 0; i < h; i += 4) {
+            ctx.beginPath();
+            ctx.moveTo(0, i);
+            ctx.lineTo(w, i);
+            ctx.stroke();
+          }
+        } else if (fx.type === "bubbles") {
+          fx.particles.forEach(p => {
+            p.phase += .02 * speed;
+            p.y -= p.vy * speed;
+            p.x += Math.sin(p.phase) * p.drift * speed;
+            if (p.y < -p.r * 2) { p.y = h + p.r * 2; p.x = Math.random() * w; }
+            ctx.strokeStyle = "rgba(220,245,255,.22)";
+            ctx.fillStyle = "rgba(220,245,255,.05)";
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+          });
+        } else if (fx.type === "orbits") {
+          fx.particles.forEach((p, idx) => {
+            p.angle += p.speed * speed;
+            const x = p.cx + Math.cos(p.angle + idx * .1) * p.radiusX;
+            const y = p.cy + Math.sin(p.angle) * p.radiusY;
+            const gradient = ctx.createRadialGradient(x, y, 0, x, y, p.size * 6);
+            gradient.addColorStop(0, "rgba(255,255,255,.55)");
+            gradient.addColorStop(1, "rgba(255,255,255,0)");
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.arc(x, y, p.size * 6, 0, Math.PI * 2);
+            ctx.fill();
+          });
+          ctx.strokeStyle = "rgba(255,255,255,.06)";
+          ctx.beginPath();
+          ctx.arc(w/2, h/2, Math.min(w,h) * .16, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+      }
+
+      function exportData() {
+        const data = JSON.stringify({
+          version: 2,
+          exportedAt: new Date().toISOString(),
+          state
+        }, null, 2);
+        const blob = new Blob([data], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `shizuka-home-${todayKey()}.json`;
+        link.click();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+      }
+
+      async function importData(file) {
+        try {
+          const parsed = JSON.parse(await file.text());
+          const imported = parsed.state || parsed;
+          if (!Array.isArray(imported.tasks)) throw new Error("Arquivo inválido");
+          state = {
+            ...structuredClone(defaultState),
+            ...imported,
+            settings: { ...defaultSettings, ...(imported.settings || {}) },
+            tasks: imported.tasks.map(normalizeTask)
+          };
+          saveState();
+          bindSettingsToInputs();
+        updateThemeDescription();
+        applyThemePalette();
+        await applyWallpaper();
+          resetFx();
+          render();
+          configureAutoWallpaper();
+          notify("Configurações importadas.");
+        } catch {
+          notify("O arquivo de configurações é inválido.");
+        }
+      }
+
+      els.searchForm.addEventListener("submit", event => {
+        event.preventDefault();
+        const query = els.searchInput.value.trim();
+        if (!query) return;
+        const urls = {
+          google: "https://www.google.com/search?q=",
+          duck: "https://duckduckgo.com/?q=",
+          youtube: "https://www.youtube.com/results?search_query=",
+          wikipedia: "https://pt.wikipedia.org/w/index.php?search="
+        };
+        location.href = urls[els.searchEngine.value] + encodeURIComponent(query);
+      });
+
+      els.searchEngine.addEventListener("change", () => {
+        state.searchEngine = els.searchEngine.value;
+        saveState();
+      });
+
+      els.taskForm.addEventListener("submit", event => {
+        event.preventDefault();
+        const title = els.taskTitle.value.trim();
+        const minutes = Math.min(1440, Math.max(1, Number(els.taskMinutes.value) || 25));
+        if (!title) return;
+
+        const task = {
+          id: uid(),
+          title,
+          minutes,
+          remaining: minutes * 60,
+          done: false,
+          repeat: els.taskRepeat.checked,
+          running: false,
+          lastTick: null,
+          alarm: "default",
+          alerted: false
+        };
+
+        state.tasks.push(task);
+        state.activeId = task.id;
+        saveState();
+
+        els.taskTitle.value = "";
+        els.taskTitle.focus();
+        render();
+      });
+
+      els.taskList.addEventListener("click", event => {
+        const button = event.target.closest("[data-action]");
+        const row = event.target.closest("[data-id]");
+        if (!button || !row) return;
+        const { id } = row.dataset;
+        const action = button.dataset.action;
+
+        if (action === "toggle") toggleTask(id);
+        if (action === "select") selectTask(id);
+        if (action === "play") toggleTimer(id);
+        if (action === "edit") editTask(id);
+        if (action === "delete") removeTask(id);
+      });
+
+      els.taskList.addEventListener("keydown", event => {
+        if ((event.key === "Enter" || event.key === " ") && event.target.dataset.action === "select") {
+          event.preventDefault();
+          selectTask(event.target.closest("[data-id]").dataset.id);
+        }
+      });
+
+      els.toggleTimer.addEventListener("click", async () => {
+        if (state.settings.notificationsEnabled && "Notification" in window && Notification.permission === "default") {
+          Notification.requestPermission().catch(() => {});
+        }
+        await toggleTimer();
+      });
+
+      els.resetTimer.addEventListener("click", resetTimer);
+
+      els.durationInput.addEventListener("change", () => {
+        const task = activeTask();
+        if (!task) return;
+        const minutes = Math.min(1440, Math.max(1, Number(els.durationInput.value) || 25));
+        task.minutes = minutes;
+        task.remaining = minutes * 60;
+        task.running = false;
+        task.lastTick = null;
+        task.alerted = false;
+        saveState();
+        render();
+      });
+
+      els.clearDone.addEventListener("click", () => {
+        state.tasks = state.tasks.filter(task => !task.done);
+        if (!state.tasks.some(task => task.id === state.activeId)) state.activeId = state.tasks[0]?.id ?? null;
+        saveState();
+        render();
+      });
+
+      els.resetDay.addEventListener("click", () => {
+        state.tasks.forEach(task => {
+          task.done = false;
+          task.running = false;
+          task.lastTick = null;
+          task.remaining = task.minutes * 60;
+          task.alerted = false;
+        });
+        saveState();
+        render();
+      });
+
+      els.cancelEdit.addEventListener("click", () => els.editDialog.close());
+
+      els.editForm.addEventListener("submit", event => {
+        event.preventDefault();
+        const task = state.tasks.find(t => t.id === editingId);
+        if (!task) return els.editDialog.close();
+
+        const title = els.editTitle.value.trim();
+        const minutes = Math.min(1440, Math.max(1, Number(els.editMinutes.value) || 25));
+        if (!title) return;
+
+        task.title = title;
+        if (task.minutes !== minutes) {
+          task.minutes = minutes;
+          task.remaining = minutes * 60;
+          task.running = false;
+          task.lastTick = null;
+          task.alerted = false;
+        }
+        task.repeat = els.editRepeat.checked;
+        task.alarm = els.editAlarm.value;
+        saveState();
+        els.editDialog.close();
+        render();
+      });
+
+      els.openSettings.addEventListener("click", openSettings);
+      els.closeSettings.addEventListener("click", closeSettings);
+      els.drawerBackdrop.addEventListener("click", closeSettings);
+      document.addEventListener("keydown", event => {
+        if (event.key === "Escape" && els.settingsDrawer.classList.contains("open")) closeSettings();
+      });
+
+      els.applyWallpaperUrl.addEventListener("click", async () => {
+        const url = els.wallpaperUrl.value.trim();
+        if (!/^https?:\/\//i.test(url) && !/^data:image\//i.test(url)) {
+          return notify("Use uma URL de imagem começando com http:// ou https://.");
+        }
+        state.settings.wallpaperMode = "url";
+        state.settings.wallpaperUrl = url;
+        state.settings.wallpaperCreditUrl = url;
+        saveState();
+        await applyWallpaper();
+        els.wallpaperStatus.textContent = "Wallpaper por URL aplicado.";
+      });
+
+      els.wallpaperFile.addEventListener("change", async () => {
+        const file = els.wallpaperFile.files?.[0];
+        if (!file) return;
+        if (!file.type.startsWith("image/")) return notify("Escolha um arquivo de imagem.");
+        try {
+          await putAsset("customWallpaper", file);
+          state.settings.wallpaperMode = "upload";
+          state.settings.wallpaperUrl = "";
+          state.settings.wallpaperCreditUrl = "";
+          saveState();
+          await applyWallpaper();
+          els.wallpaperStatus.textContent = `Imagem local: ${file.name}`;
+          notify("Wallpaper local aplicado.");
+        } catch {
+          notify("Não foi possível salvar essa imagem.");
+        }
+        els.wallpaperFile.value = "";
+      });
+
+      els.restoreBuiltin.addEventListener("click", () => {
+        state.settings.wallpaperMode = "builtin";
+        state.settings.wallpaperUrl = "";
+        state.settings.wallpaperCreditUrl = "";
+        saveState();
+        applyWallpaper();
+        els.wallpaperStatus.textContent = "Fundo japonês original restaurado.";
+      });
+
+      els.randomWallpaper.addEventListener("click", async () => {
+        saveVisualSettings();
+        await fetchRandomWallpaper(true);
+        els.randomWallpaper.disabled = false;
+      });
+
+      els.themePreset.addEventListener("change", () => {
+        updateThemeDescription();
+      });
+
+      els.applyThemePreset.addEventListener("click", () => {
+        setThemePreset(els.themePreset.value, { fetchWallpaper: false, notifyUser: true });
+      });
+
+      els.applyThemeWithWallpaper.addEventListener("click", () => {
+        setThemePreset(els.themePreset.value, { fetchWallpaper: true, notifyUser: true });
+      });
+
+      els.cycleTheme.addEventListener("click", () => {
+        const keys = themeList();
+        const next = keys[Math.floor(Math.random() * keys.length)] || "japanese";
+        els.themePreset.value = next;
+        updateThemeDescription();
+        setThemePreset(next, { fetchWallpaper: false, notifyUser: true });
+      });
+
+      els.adultMode.addEventListener("change", async () => {
+        if (els.adultMode.checked) {
+          const confirmed = confirm(
+            "Confirme que você tem 18 anos ou mais e deseja permitir wallpapers adultos. " +
+            "A classificação é feita por terceiros e pode conter erros."
+          );
+          if (!confirmed) {
+            els.adultMode.checked = false;
+            return;
+          }
+          state.settings.adultMode = true;
+          state.settings.adultConfirmed = true;
+          state.settings.wallpaperProvider = "waifu";
+          els.wallpaperProvider.value = "waifu";
+          els.adultOptions.classList.remove("hidden");
+          els.wallpaperStatus.textContent = "Modo adulto ativado. O Waifu.im será usado como fonte principal.";
+        } else {
+          state.settings.adultMode = false;
+          state.settings.wallpaperMode = "builtin";
+          state.settings.wallpaperUrl = "";
+          state.settings.wallpaperCreditUrl = "";
+          els.adultOptions.classList.add("hidden");
+          els.wallpaperStatus.textContent = "Modo adulto desativado e fundo original restaurado.";
+        }
+        saveState();
+        await applyWallpaper();
+      });
+
+      els.resetWallpaperFraming.addEventListener("click", () => {
+        state.settings.wallpaperZoom = 100;
+        state.settings.wallpaperFocusX = 50;
+        state.settings.wallpaperFocusY = 50;
+        els.wallpaperZoom.value = 100;
+        els.wallpaperFocusX.value = 50;
+        els.wallpaperFocusY.value = 50;
+        saveState();
+        applyWallpaperLayout();
+        updateSettingLabels();
+      });
+
+      [
+        els.themePreset,
+        els.wallpaperProvider, els.wallpaperRotate, els.wallpaperTags, els.wallpaperFit,
+        els.wallpaperZoom, els.wallpaperFocusX, els.wallpaperFocusY, els.adultRating,
+        els.backgroundDim, els.backgroundBlur, els.animationType, els.animationIntensity,
+        els.animationSpeed, els.alarmTone, els.alarmRepeats, els.alarmVolume,
+        els.notificationsEnabled, els.panelOpacity
+      ].forEach(element => {
+        element.addEventListener(element.type === "range" ? "input" : "change", saveVisualSettings);
+      });
+
+      els.alarmFile.addEventListener("change", async () => {
+        const file = els.alarmFile.files?.[0];
+        if (!file) return;
+        if (!file.type.startsWith("audio/")) return notify("Escolha um arquivo de áudio.");
+        try {
+          await putAsset("customAlarm", file);
+          state.settings.customAlarmName = file.name;
+          state.settings.alarmTone = "custom";
+          saveState();
+          bindSettingsToInputs();
+          notify("Áudio personalizado salvo.");
+          await playAlarm("custom");
+        } catch {
+          notify("Não foi possível salvar esse áudio.");
+        }
+        els.alarmFile.value = "";
+      });
+
+      els.testAlarm.addEventListener("click", async () => {
+        await unlockAudio();
+        await playAlarm(state.settings.alarmTone);
+      });
+
+      els.exportSettings.addEventListener("click", exportData);
+
+      els.importSettings.addEventListener("change", async () => {
+        const file = els.importSettings.files?.[0];
+        if (file) await importData(file);
+        els.importSettings.value = "";
+      });
+
+      els.resetEverything.addEventListener("click", async () => {
+        const confirmed = confirm("Apagar tarefas, preferências, wallpaper e áudio personalizados?");
+        if (!confirmed) return;
+        localStorage.removeItem(STORAGE_KEY);
+        OLD_STORAGE_KEYS.forEach(key => localStorage.removeItem(key));
+        await deleteAsset("customWallpaper").catch(() => {});
+        await deleteAsset("customAlarm").catch(() => {});
+        location.reload();
+      });
+
+      window.addEventListener("resize", () => {
+        resizeCanvas();
+        applyWallpaperLayout();
+      });
+      window.addEventListener("beforeunload", () => {
+        syncRunningTimers();
+        saveState();
+      });
+
+      async function init() {
+        updateClock();
+        handleNewDay();
+        if (!state.activeId && state.tasks.length) state.activeId = state.tasks[0].id;
+        bindSettingsToInputs();
+        await applyWallpaper();
+        resizeCanvas();
+        cancelAnimationFrame(animationFrame);
+        animationFrame = requestAnimationFrame(drawFx);
+        render();
+        configureAutoWallpaper();
+        maybeFetchWallpaperAtStartup();
+
+        setInterval(updateClock, 1000);
+        setInterval(() => {
+          syncRunningTimers();
+          renderTimer();
+          const task = activeTask();
+          if (task && task.remaining === 0 && !task.running) render();
+        }, 1000);
+      }
+
+      init();
+    })();
+  </script>
+</body>
+</html>
