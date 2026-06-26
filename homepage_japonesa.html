@@ -19,6 +19,9 @@
       --shadow: 0 24px 80px rgba(9, 13, 11, 0.28);
       --radius: 24px;
       --panel-opacity: .92;
+      --panel-blur: 8px;
+      --panel-border-opacity: .44;
+      --panel-shadow-opacity: .28;
     }
 
     * { box-sizing: border-box; }
@@ -284,13 +287,13 @@
       max-width: 760px;
       margin: 0 auto 22px;
       background: rgba(244, 239, 226, calc(var(--panel-opacity) - .04));
-      border: 1px solid rgba(255,255,255,.4);
+      border: 1px solid rgba(255,255,255,var(--panel-border-opacity));
       border-radius: 999px;
       display: flex;
       align-items: center;
       padding: 7px 8px 7px 18px;
       box-shadow: var(--shadow);
-      backdrop-filter: blur(18px);
+      backdrop-filter: blur(var(--panel-blur));
     }
 
     .search-shell svg {
@@ -325,9 +328,9 @@
       padding: 14px;
       border-radius: 24px;
       background: rgba(244, 239, 226, calc(var(--panel-opacity) - .10));
-      border: 1px solid rgba(255,255,255,.34);
-      box-shadow: 0 18px 55px rgba(9, 13, 11, 0.20);
-      backdrop-filter: blur(18px);
+      border: 1px solid rgba(255,255,255,var(--panel-border-opacity));
+      box-shadow: 0 18px 55px rgba(9, 13, 11, var(--panel-shadow-opacity));
+      backdrop-filter: blur(var(--panel-blur));
       color: var(--ink);
     }
 
@@ -681,6 +684,175 @@
     body.density-comfortable .card-header { padding: 26px 28px 18px; }
     body.density-comfortable .timer-card { padding: 30px; }
 
+
+    .theme-toolbar {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 150px;
+      gap: 10px;
+      align-items: end;
+    }
+
+    .theme-browser {
+      display: grid;
+      gap: 11px;
+      margin-top: 12px;
+    }
+
+    .theme-browser-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .theme-filter {
+      min-width: min(250px, 100%);
+      flex: 1;
+    }
+
+    .theme-category-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+
+    .theme-card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 9px;
+      max-height: 360px;
+      overflow: auto;
+      padding-right: 3px;
+    }
+
+    .theme-card-option {
+      text-align: left;
+      border-radius: 15px;
+      padding: 11px;
+      background: rgba(255,255,255,.34);
+      border: 1px solid rgba(23,25,22,.10);
+      display: grid;
+      gap: 8px;
+      min-height: 116px;
+    }
+
+    .theme-card-option.active {
+      border-color: var(--red);
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--red) 22%, transparent);
+    }
+
+    .theme-card-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      font-weight: 850;
+    }
+
+    .theme-card-symbol {
+      width: 30px;
+      aspect-ratio: 1;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: rgba(23,25,22,.08);
+      font-family: Georgia, serif;
+    }
+
+    .theme-card-desc {
+      color: rgba(23,25,22,.58);
+      font-size: .72rem;
+      line-height: 1.35;
+    }
+
+    .theme-card-swatches {
+      display: flex;
+      gap: 5px;
+      margin-top: auto;
+    }
+
+    .theme-card-swatch {
+      width: 17px;
+      height: 17px;
+      border-radius: 50%;
+      border: 1px solid rgba(23,25,22,.13);
+    }
+
+    .theme-browser-empty {
+      display: none;
+      padding: 16px;
+      text-align: center;
+      color: rgba(23,25,22,.58);
+      border: 1px dashed rgba(23,25,22,.16);
+      border-radius: 15px;
+    }
+
+    .theme-browser-empty.visible { display: block; }
+
+    .pomodoro-toggle-inline {
+      min-width: 132px;
+    }
+
+    body.pomodoro-hidden .side { display: none; }
+    body.pomodoro-hidden .grid {
+      grid-template-columns: minmax(0, 860px);
+      justify-content: center;
+    }
+
+    .finder-web-panel {
+      margin: 8px 0 14px;
+      padding: 12px;
+      border-radius: 16px;
+      background: rgba(23,25,22,.055);
+      border: 1px solid rgba(23,25,22,.10);
+    }
+
+    .finder-web-panel strong { display: block; margin-bottom: 4px; }
+    .finder-web-panel small { color: rgba(23,25,22,.58); line-height: 1.45; }
+
+    .finder-tools.extended {
+      grid-template-columns: minmax(0, 1fr) 145px auto auto;
+    }
+
+    .site-row.web-search-row {
+      background: rgba(182,66,58,.08);
+      border-color: rgba(182,66,58,.18);
+    }
+
+    .site-row.manual-domain-row {
+      background: rgba(73,92,74,.10);
+      border-color: rgba(73,92,74,.18);
+    }
+
+    body.theme-dark-ui .theme-card-option,
+    body.theme-dark-ui .finder-web-panel {
+      background: rgba(255,255,255,.055);
+      border-color: rgba(238,245,255,.10);
+    }
+
+    body.theme-dark-ui .theme-card-desc,
+    body.theme-dark-ui .theme-browser-empty,
+    body.theme-dark-ui .finder-web-panel small {
+      color: rgba(232,238,242,.62);
+    }
+
+    body.theme-dark-ui .theme-card-symbol {
+      background: rgba(255,255,255,.08);
+    }
+
+    body.low-panel-opacity .card,
+    body.low-panel-opacity .favorites-panel,
+    body.low-panel-opacity .search-shell {
+      box-shadow: none;
+    }
+
+    body.low-panel-opacity .card-header,
+    body.low-panel-opacity .add-task,
+    body.low-panel-opacity .footer-tools {
+      border-color: color-mix(in srgb, var(--line) 55%, transparent);
+    }
+
     .grid {
       display: grid;
       grid-template-columns: minmax(0, 1.45fr) minmax(300px, .75fr);
@@ -690,10 +862,10 @@
 
     .card {
       background: rgba(244, 239, 226, var(--panel-opacity));
-      border: 1px solid rgba(255,255,255,.44);
+      border: 1px solid rgba(255,255,255,var(--panel-border-opacity));
       border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(20px);
+      box-shadow: 0 24px 80px rgba(9, 13, 11, var(--panel-shadow-opacity));
+      backdrop-filter: blur(var(--panel-blur));
       overflow: hidden;
     }
 
@@ -1141,7 +1313,7 @@
       gap: 15px;
       padding: 20px 22px;
       background: rgba(238,232,217,.94);
-      backdrop-filter: blur(18px);
+      backdrop-filter: blur(var(--panel-blur));
       border-bottom: 1px solid var(--line);
     }
 
@@ -1461,6 +1633,7 @@
       .setting-grid { grid-template-columns: 1fr; }
       .settings-content { padding-inline: 13px; }
       .favorites-head, .finder-top { align-items: stretch; flex-direction: column; }
+      .theme-toolbar, .finder-tools.extended { grid-template-columns: 1fr; }
       .favorite-actions, .finder-actions { justify-content: stretch; }
       .favorite-actions .mini-button, .finder-actions .mini-button { flex: 1; }
       .finder-tools { grid-template-columns: 1fr; }
@@ -1530,7 +1703,8 @@
         </div>
         <div class="favorite-actions">
           <button class="mini-button accent" id="addFavorite" type="button">+ Favorito</button>
-          <button class="mini-button" id="openSiteFinder" type="button">Explorar por categoria</button>
+          <button class="mini-button" id="openSiteFinder" type="button">Explorar sites</button>
+          <button class="mini-button pomodoro-toggle-inline" id="togglePomodoro" type="button">Ocultar Pomodoro</button>
         </div>
       </div>
       <div class="favorites-list" id="favoriteList"></div>
@@ -1564,7 +1738,7 @@
         </div>
       </article>
 
-      <aside class="side">
+      <aside class="side" id="pomodoroPanel">
         <article class="card timer-card">
           <div class="timer-kicker">集中 · foco</div>
           <div class="focus-name" id="focusName">Selecione uma tarefa</div>
@@ -1660,9 +1834,21 @@
         </div>
       </div>
 
-      <div class="finder-tools">
-        <input class="field" id="siteFinderInput" placeholder="Pesquise: tecnologia, jogos, linux, programação..." autocomplete="off" />
-        <button class="mini-button" type="button" id="clearSiteFinder">Limpar busca</button>
+      <div class="finder-tools extended">
+        <input class="field" id="siteFinderInput" placeholder="Pesquise categoria, nome, assunto ou domínio: tecnologia, jogos, linux, github.com..." autocomplete="off" />
+        <select class="field" id="siteWebSearchEngine" aria-label="Buscar novos sites usando">
+          <option value="google">Google</option>
+          <option value="duck">DuckDuckGo</option>
+          <option value="brave">Brave Search</option>
+          <option value="reddit">Reddit</option>
+        </select>
+        <button class="mini-button accent" type="button" id="searchNewSites">Buscar novos</button>
+        <button class="mini-button" type="button" id="clearSiteFinder">Limpar</button>
+      </div>
+
+      <div class="finder-web-panel">
+        <strong>Catálogo + busca externa</strong>
+        <small>O catálogo aparece aqui dentro. Para descobrir sites que ainda não estão na lista, pesquise um termo e use “Buscar novos”; quando encontrar um domínio, cole no botão “Inserir manualmente” ou digite o domínio direto na busca para criar um favorito.</small>
       </div>
 
       <div class="category-chips" id="siteCategoryChips" aria-label="Categorias de sites"></div>
@@ -1683,37 +1869,62 @@
 
     <div class="settings-content">
 <section class="settings-section">
-  <h3>Temas gerais</h3>
-  <p class="help">Troque a identidade visual inteira da página. Há temas originais e temas inspirados em atmosferas como hacker, Wired/Lain e Frieren.</p>
+  <h3>Temas</h3>
+  <p class="help">Escolha a identidade visual por cartões e aplique o modo escuro sobre qualquer tema, sem duplicar a lista inteira.</p>
 
-  <div class="setting">
-    <label for="themePreset">Tema</label>
-    <select id="themePreset">
-      <option value="dark_academic">Escuro acadêmico</option>
-      <option value="japanese">Japonês clássico</option>
-      <option value="hacker">Hacker terminal</option>
-      <option value="lain">Wired / Lain</option>
-      <option value="frieren">Frieren / fantasia serena</option>
-      <option value="cyberpunk">Cyberpunk neon</option>
-      <option value="manga_noir">Mangá noir</option>
-      <option value="shrine_autumn">Santuário de outono</option>
-      <option value="moonlit_study">Estudo ao luar</option>
-      <option value="rainy_noir">Noite chuvosa</option>
-      <option value="vaporwave">Vaporwave</option>
-      <option value="retro_terminal">Terminal retrô</option>
-      <option value="sakura_dream">Sakura dream</option>
-      <option value="forest_spirit">Espírito da floresta</option>
-      <option value="ocean_breeze">Brisa oceânica</option>
-      <option value="occult_library">Biblioteca oculta</option>
-      <option value="neon_tokyo">Tokyo neon</option>
-      <option value="lofi_night">Lofi night</option>
-      <option value="winter_monastery">Mosteiro de inverno</option>
-    </select>
+  <div class="theme-toolbar">
+    <div class="setting">
+      <label for="themePreset">Tema selecionado</label>
+      <select id="themePreset" aria-label="Tema selecionado">
+        <optgroup label="Base / estudo">
+          <option value="dark_academic">Escuro acadêmico</option>
+          <option value="japanese">Japonês clássico</option>
+          <option value="moonlit_study">Estudo ao luar</option>
+          <option value="lofi_night">Lofi night</option>
+          <option value="winter_monastery">Mosteiro de inverno</option>
+        </optgroup>
+        <optgroup label="Tecnologia / cidade">
+          <option value="hacker">Hacker terminal</option>
+          <option value="lain">Wired / Lain</option>
+          <option value="cyberpunk">Cyberpunk neon</option>
+          <option value="retro_terminal">Terminal retrô</option>
+          <option value="neon_tokyo">Tokyo neon</option>
+          <option value="rainy_noir">Noite chuvosa</option>
+        </optgroup>
+        <optgroup label="Anime / fantasia / natureza">
+          <option value="frieren">Frieren / fantasia serena</option>
+          <option value="manga_noir">Mangá noir</option>
+          <option value="shrine_autumn">Santuário de outono</option>
+          <option value="sakura_dream">Sakura dream</option>
+          <option value="forest_spirit">Espírito da floresta</option>
+          <option value="ocean_breeze">Brisa oceânica</option>
+          <option value="occult_library">Biblioteca oculta</option>
+          <option value="vaporwave">Vaporwave</option>
+        </optgroup>
+      </select>
+    </div>
+
+    <div class="setting">
+      <label for="themeMode">Modo</label>
+      <select id="themeMode">
+        <option value="dark">Dark</option>
+        <option value="original">Original</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="theme-browser">
+    <div class="theme-browser-head">
+      <input class="field theme-filter" id="themeSearch" placeholder="Filtrar temas: anime, escuro, natureza, hacker..." autocomplete="off" />
+      <div class="theme-category-chips" id="themeCategoryChips" aria-label="Categorias de temas"></div>
+    </div>
+    <div class="theme-card-grid" id="themeCardGrid"></div>
+    <div class="theme-browser-empty" id="themeBrowserEmpty">Nenhum tema encontrado com esse filtro.</div>
   </div>
 
   <div class="theme-preview" id="themeDescription">
-    <strong>Japonês clássico</strong>
-    Visual tranquilo com pétalas, tons de papel e vermelho tradicional.
+    <strong>Escuro acadêmico</strong>
+    Tema escuro limpo, com contraste confortável para estudo.
   </div>
 
   <div class="setting-actions">
@@ -1945,7 +2156,7 @@
 
       <section class="settings-section">
         <h3>Aparência da interface</h3>
-        <p class="help">Controle o tamanho geral da tela e a força visual dos painéis.</p>
+        <p class="help">Controle o tamanho geral e deixe os painéis realmente transparentes quando quiser ver o wallpaper com nitidez.</p>
         <div class="setting-grid">
           <div class="setting">
             <label for="uiDensity">Tamanho</label>
@@ -1956,10 +2167,15 @@
             </select>
           </div>
           <div class="setting">
-            <div class="value-line"><label for="panelOpacity">Opacidade</label><span id="panelOpacityValue">88%</span></div>
-            <input id="panelOpacity" type="range" min="58" max="100" value="88" />
+            <div class="value-line"><label for="panelOpacity">Transparência dos painéis</label><span id="panelOpacityValue">88%</span></div>
+            <input id="panelOpacity" type="range" min="0" max="100" value="88" />
           </div>
         </div>
+        <div class="setting">
+          <div class="value-line"><label for="panelBlur">Desfoque dos painéis</label><span id="panelBlurValue">6 px</span></div>
+          <input id="panelBlur" type="range" min="0" max="24" value="6" />
+        </div>
+        <p class="fit-preview-note">Para ver o wallpaper bem nítido, use opacidade baixa e desfoque 0 px.</p>
       </section>
 
       <section class="settings-section">
@@ -2007,6 +2223,7 @@
         adultRating: "questionable",
         adultConfirmed: false,
         themePreset: "dark_academic",
+        themeMode: "dark",
         backgroundDim: 46,
         backgroundBlur: 0,
         animationType: "stars",
@@ -2018,7 +2235,9 @@
         notificationsEnabled: true,
         customAlarmName: "",
         panelOpacity: 88,
+        panelBlur: 6,
         uiDensity: "medium",
+        pomodoroVisible: true,
         lastWallpaperFetch: "",
         lastWallpaperDay: ""
       };
@@ -2118,6 +2337,22 @@ const THEME_PRESETS = {
         "qconcursos.com": "Qconcursos"
       };
 
+      const THEME_CATEGORY_META = {
+        todos: { label: "Todos", keywords: [] },
+        estudo: { label: "Estudo", keywords: ["dark_academic", "japanese", "moonlit_study", "lofi_night", "winter_monastery"] },
+        tech: { label: "Tech", keywords: ["hacker", "lain", "cyberpunk", "retro_terminal", "neon_tokyo", "rainy_noir"] },
+        anime: { label: "Anime/fantasia", keywords: ["frieren", "manga_noir", "sakura_dream", "vaporwave"] },
+        natureza: { label: "Natureza", keywords: ["shrine_autumn", "forest_spirit", "ocean_breeze", "winter_monastery"] },
+        escuros: { label: "Bons no dark", keywords: ["dark_academic", "hacker", "lain", "moonlit_study", "rainy_noir", "retro_terminal", "occult_library", "neon_tokyo", "lofi_night"] }
+      };
+
+      const ONLINE_SEARCH_ENGINES = {
+        google: query => `https://www.google.com/search?q=${encodeURIComponent(query)}`,
+        duck: query => `https://duckduckgo.com/?q=${encodeURIComponent(query)}`,
+        brave: query => `https://search.brave.com/search?q=${encodeURIComponent(query)}`,
+        reddit: query => `https://www.google.com/search?q=${encodeURIComponent(`${query} site:reddit.com`)}`
+      };
+
 const defaultState = {
         date: todayKey(),
         activeId: null,
@@ -2131,14 +2366,14 @@ const defaultState = {
       };
 
       const els = Object.fromEntries([
-        "clockTime","clockDate","searchForm","searchInput","searchEngine","favoriteList","addFavorite","openSiteFinder",
+        "clockTime","clockDate","searchForm","searchInput","searchEngine","favoriteList","addFavorite","openSiteFinder","togglePomodoro","pomodoroPanel",
         "favoriteDialog","favoriteForm","favoriteDialogTitle","favoriteUrl","favoriteName","favoriteCategory","favoriteAutofillHint","cancelFavorite",
-        "siteFinderDialog","closeSiteFinder","finderManualFavorite","siteFinderInput","clearSiteFinder","siteCategoryChips","siteFinderList","siteFinderEmpty",
+        "siteFinderDialog","closeSiteFinder","finderManualFavorite","siteFinderInput","siteWebSearchEngine","searchNewSites","clearSiteFinder","siteCategoryChips","siteFinderList","siteFinderEmpty",
         "taskForm","taskTitle","taskMinutes","taskRepeat","taskList","progressRing","progressText","clearDone","resetDay",
         "focusName","timerTime","enso","toggleTimer","resetTimer","durationInput","activeAlarmLabel",
         "editDialog","editForm","editTitle","editMinutes","editAlarm","editRepeat","cancelEdit","toast",
         "openSettings","closeSettings","settingsDrawer","drawerBackdrop","wallpaperLayer","wallpaperBackdrop",
-        "wallpaperImage","defaultScene","themeOverlay","backgroundShade","fxCanvas","brandMon","themePreset","themeDescription","applyThemePreset","applyThemeWithWallpaper","cycleTheme","wallpaperUrl","applyWallpaperUrl",
+        "wallpaperImage","defaultScene","themeOverlay","backgroundShade","fxCanvas","brandMon","themePreset","themeMode","themeSearch","themeCategoryChips","themeCardGrid","themeBrowserEmpty","themeDescription","applyThemePreset","applyThemeWithWallpaper","cycleTheme","wallpaperUrl","applyWallpaperUrl",
         "wallpaperFile","restoreBuiltin","wallpaperProvider","wallpaperRotate","wallpaperTags",
         "adultMode","adultOptions","adultRating","randomWallpaper","wallpaperFit","wallpaperZoom",
         "wallpaperZoomValue","wallpaperFocusX","wallpaperFocusXValue","wallpaperFocusY",
@@ -2146,7 +2381,7 @@ const defaultState = {
         "backgroundBlur","backgroundBlurValue",
         "wallpaperStatus","wallpaperCredit","animationType","animationIntensity","animationSpeed",
         "animationSpeedValue","alarmTone","alarmRepeats","alarmVolume","alarmVolumeValue","alarmFile",
-        "testAlarm","alarmFileStatus","notificationsEnabled","panelOpacity","panelOpacityValue","uiDensity",
+        "testAlarm","alarmFileStatus","notificationsEnabled","panelOpacity","panelOpacityValue","panelBlur","panelBlurValue","uiDensity",
         "exportSettings","importSettings","resetEverything"
       ].map(id => [id, document.getElementById(id)]));
 
@@ -2668,8 +2903,33 @@ const defaultState = {
         return ["todos", ...Array.from(new Set(SITE_CATALOG.map(site => site.category))).sort((a, b) => a.localeCompare(b, "pt-BR"))];
       }
 
+      function externalSiteSearchQuery() {
+        const raw = els.siteFinderInput.value.trim();
+        const category = activeSiteCategory !== "todos" ? activeSiteCategory : "";
+        const term = raw || category || "sites úteis para estudo";
+        return `melhores sites ${term}`.trim();
+      }
+
+      function openExternalSiteSearch(query = externalSiteSearchQuery()) {
+        const engine = els.siteWebSearchEngine?.value || "google";
+        const urlBuilder = ONLINE_SEARCH_ENGINES[engine] || ONLINE_SEARCH_ENGINES.google;
+        window.open(urlBuilder(query), "_blank", "noopener,noreferrer");
+      }
+
+      function queryLooksLikeDomain(raw) {
+        const value = String(raw || "").trim();
+        return /^[a-z0-9][a-z0-9.-]+\.[a-z]{2,}(\/.*)?$/i.test(value) || /^https?:\/\//i.test(value);
+      }
+
+      function addQueryDomainAsFavorite() {
+        const raw = els.siteFinderInput.value.trim();
+        if (!queryLooksLikeDomain(raw)) return notify("Digite um domínio ou URL, como github.com.");
+        openFavoriteDialog(null, { url: raw, category: activeSiteCategory !== "todos" ? activeSiteCategory : "geral" });
+      }
+
       function renderSiteFinder() {
-        const query = normalizeText(els.siteFinderInput.value);
+        const rawQuery = els.siteFinderInput.value.trim();
+        const query = normalizeText(rawQuery);
         const categories = siteCategoryList();
         els.siteCategoryChips.innerHTML = categories.map(category => `
           <button class="category-chip ${category === activeSiteCategory ? "active" : ""}" type="button" data-category="${escapeHtml(category)}">
@@ -2685,8 +2945,7 @@ const defaultState = {
           return haystack.includes(query);
         });
 
-        els.siteFinderEmpty.classList.toggle("visible", matches.length === 0);
-        els.siteFinderList.innerHTML = matches.map(site => {
+        const rows = matches.map(site => {
           const alreadyAdded = state.favorites?.some(item => {
             try { return normalizeSiteUrl(item.url) === normalizeSiteUrl(site.url); }
             catch { return false; }
@@ -2706,13 +2965,49 @@ const defaultState = {
                 ${alreadyAdded ? "Adicionado" : "+ Add"}
               </button>
             </article>`;
-        }).join("");
+        });
+
+        if (rawQuery) {
+          rows.unshift(`
+            <article class="site-row web-search-row">
+              <div class="site-icon" aria-hidden="true">🔎</div>
+              <div>
+                <span class="site-name">Buscar novos sites sobre “${escapeHtml(rawQuery)}”</span>
+                <span class="site-url">Abre uma pesquisa externa; depois cole o domínio encontrado em “Inserir manualmente”.</span>
+                <div class="site-tags"><span class="site-tag">web</span><span class="site-tag">descoberta</span></div>
+              </div>
+              <button class="mini-button accent" type="button" data-action="online-search">Buscar</button>
+            </article>`);
+        }
+
+        if (queryLooksLikeDomain(rawQuery)) {
+          let url = rawQuery;
+          try { url = normalizeSiteUrl(rawQuery); } catch {}
+          rows.unshift(`
+            <article class="site-row manual-domain-row">
+              <img class="site-icon" src="${escapeHtml(faviconUrl(url))}" alt="" loading="lazy" />
+              <div>
+                <span class="site-name">Adicionar ${escapeHtml(inferSiteName(url))}</span>
+                <span class="site-url">${escapeHtml(siteDomain(url))}</span>
+                <div class="site-tags"><span class="site-tag">favorito novo</span></div>
+              </div>
+              <button class="mini-button accent" type="button" data-action="add-query-domain">Preparar</button>
+            </article>`);
+        }
+
+        els.siteFinderEmpty.classList.toggle("visible", rows.length === 0);
+        els.siteFinderList.innerHTML = rows.join("");
       }
 
       function applyUiDensity() {
         const density = state.settings.uiDensity || "medium";
         document.body.classList.toggle("density-compact", density === "compact");
         document.body.classList.toggle("density-comfortable", density === "comfortable");
+        document.body.classList.toggle("pomodoro-hidden", state.settings.pomodoroVisible === false);
+        if (els.togglePomodoro) {
+          els.togglePomodoro.textContent = state.settings.pomodoroVisible === false ? "Mostrar Pomodoro" : "Ocultar Pomodoro";
+          els.togglePomodoro.setAttribute("aria-pressed", String(state.settings.pomodoroVisible === false));
+        }
       }
 
       function alarmName(value) {
@@ -2843,6 +3138,185 @@ function themeList() {
   return Object.keys(THEME_PRESETS);
 }
 
+function hexToRgb(hex) {
+  const clean = String(hex || "").replace("#", "").trim();
+  if (!/^[0-9a-f]{6}$/i.test(clean)) return null;
+  return {
+    r: parseInt(clean.slice(0, 2), 16),
+    g: parseInt(clean.slice(2, 4), 16),
+    b: parseInt(clean.slice(4, 6), 16)
+  };
+}
+
+function rgbToHex({ r, g, b }) {
+  return `#${[r, g, b].map(v => Math.max(0, Math.min(255, Math.round(v))).toString(16).padStart(2, "0")).join("")}`;
+}
+
+function mixHex(a, b, amount = .5) {
+  const ca = hexToRgb(a);
+  const cb = hexToRgb(b);
+  if (!ca || !cb) return a || b || "#ffffff";
+  return rgbToHex({
+    r: ca.r * (1 - amount) + cb.r * amount,
+    g: ca.g * (1 - amount) + cb.g * amount,
+    b: ca.b * (1 - amount) + cb.b * amount
+  });
+}
+
+function darkenHex(hex, amount = .45) {
+  return mixHex(hex, "#05070a", amount);
+}
+
+function currentBaseTheme() {
+  return THEME_PRESETS[state.settings.themePreset] || THEME_PRESETS.dark_academic || THEME_PRESETS.japanese;
+}
+
+function makeDarkTheme(base) {
+  const palette = base.palette || {};
+  const accent = palette.red || "#8bb8ff";
+  const accentDeep = mixHex(accent, "#ffffff", .35);
+  return {
+    ...base,
+    name: `${base.name} · dark`,
+    description: `${base.description} Versão dark com painéis escuros e contraste melhor para estudo noturno.`,
+    palette: {
+      ink: "#edf3f7",
+      red: mixHex(accent, "#ffffff", .10),
+      redDeep: accentDeep,
+      moss: mixHex(palette.moss || accent, "#ffffff", .18),
+      gold: mixHex(palette.gold || "#e6c781", "#ffffff", .10)
+    },
+    bodyBg: darkenHex(base.bodyBg || "#0d1513", .35),
+    darkPanels: true,
+    backgroundDim: Math.max(22, Math.min(55, Number(base.backgroundDim ?? 34))),
+    backgroundBlur: Math.min(2, Number(base.backgroundBlur ?? 0)),
+    panelOpacity: Math.min(Number(base.panelOpacity ?? 88), 88)
+  };
+}
+
+function currentTheme() {
+  const base = currentBaseTheme();
+  return state.settings.themeMode === "dark" ? makeDarkTheme(base) : base;
+}
+
+function themeCategoryFor(key) {
+  for (const [category, meta] of Object.entries(THEME_CATEGORY_META)) {
+    if (category !== "todos" && meta.keywords.includes(key)) return category;
+  }
+  return "estudo";
+}
+
+let activeThemeCategory = "todos";
+
+function themeDescriptionHtml(theme) {
+  const modeLabel = state.settings.themeMode === "dark" ? "modo dark" : "modo original";
+  return `
+    <strong>${escapeHtml(theme.name)}</strong>
+    ${escapeHtml(theme.description)}
+    <small>${modeLabel} · animação sugerida: ${escapeHtml(theme.recommendedAnimation)} · tags sugeridas: ${escapeHtml(theme.wallpaperTags)}</small>
+    <div class="theme-pills">
+      <span class="theme-pill">animação: ${escapeHtml(theme.animationType)}</span>
+      <span class="theme-pill">intensidade: ${escapeHtml(theme.animationIntensity)}</span>
+      <span class="theme-pill">opacidade sugerida: ${theme.panelOpacity}%</span>
+    </div>
+    <div class="theme-swatches">
+      <span class="theme-swatch" style="background:${theme.palette.red}"></span>
+      <span class="theme-swatch" style="background:${theme.palette.redDeep}"></span>
+      <span class="theme-swatch" style="background:${theme.palette.moss}"></span>
+      <span class="theme-swatch" style="background:${theme.palette.gold}"></span>
+    </div>
+  `;
+}
+
+function renderThemeBrowser() {
+  const query = normalizeText(els.themeSearch?.value || "");
+  els.themeCategoryChips.innerHTML = Object.entries(THEME_CATEGORY_META).map(([key, meta]) => `
+    <button class="category-chip ${key === activeThemeCategory ? "active" : ""}" type="button" data-theme-category="${escapeHtml(key)}">
+      ${escapeHtml(meta.label)}
+    </button>
+  `).join("");
+
+  const cards = themeList().filter(key => {
+    const base = THEME_PRESETS[key];
+    const inCategory = activeThemeCategory === "todos" || THEME_CATEGORY_META[activeThemeCategory]?.keywords.includes(key);
+    if (!inCategory) return false;
+    if (!query) return true;
+    const haystack = normalizeText([key, base.name, base.description, base.recommendedAnimation, base.wallpaperTags, themeCategoryFor(key)].join(" "));
+    return haystack.includes(query);
+  });
+
+  els.themeBrowserEmpty.classList.toggle("visible", cards.length === 0);
+  els.themeCardGrid.innerHTML = cards.map(key => {
+    const base = THEME_PRESETS[key];
+    const preview = state.settings.themeMode === "dark" ? makeDarkTheme(base) : base;
+    return `
+      <button class="theme-card-option ${key === els.themePreset.value ? "active" : ""}" type="button" data-theme-key="${escapeHtml(key)}">
+        <span class="theme-card-title">
+          <span>${escapeHtml(base.name)}</span>
+          <span class="theme-card-symbol">${escapeHtml(base.symbol || "日")}</span>
+        </span>
+        <span class="theme-card-desc">${escapeHtml(base.description)}</span>
+        <span class="theme-card-swatches">
+          <span class="theme-card-swatch" style="background:${preview.palette.red}"></span>
+          <span class="theme-card-swatch" style="background:${preview.palette.redDeep}"></span>
+          <span class="theme-card-swatch" style="background:${preview.palette.moss}"></span>
+          <span class="theme-card-swatch" style="background:${preview.palette.gold}"></span>
+        </span>
+      </button>`;
+  }).join("");
+}
+
+function updateThemeDescription() {
+  const base = THEME_PRESETS[els.themePreset.value] || currentBaseTheme();
+  const theme = (els.themeMode?.value || state.settings.themeMode) === "dark" ? makeDarkTheme(base) : base;
+  els.themeDescription.innerHTML = themeDescriptionHtml(theme);
+  renderThemeBrowser();
+}
+
+function applyThemePalette() {
+  const theme = currentTheme();
+  const root = document.documentElement;
+  root.style.setProperty("--ink", theme.palette.ink);
+  root.style.setProperty("--red", theme.palette.red);
+  root.style.setProperty("--red-deep", theme.palette.redDeep);
+  root.style.setProperty("--moss", theme.palette.moss);
+  root.style.setProperty("--gold", theme.palette.gold);
+  root.style.setProperty("--line", theme.darkPanels ? "rgba(238,245,255,.12)" : "rgba(34, 37, 32, 0.14)");
+  document.body.classList.toggle("theme-dark-ui", Boolean(theme.darkPanels));
+  document.body.style.background = theme.bodyBg || "#0d1513";
+  els.defaultScene.style.background = theme.sceneBackground || "";
+  const sun = document.querySelector(".sun");
+  if (sun) sun.style.background = theme.sunBackground || "";
+  els.themeOverlay.style.cssText = "opacity:0;background:transparent;";
+  if (theme.overlayStyle) {
+    els.themeOverlay.style.cssText = theme.overlayStyle;
+  }
+  if (els.brandMon) els.brandMon.textContent = theme.symbol || "日";
+}
+
+function setThemePreset(name, { fetchWallpaper = false, notifyUser = true } = {}) {
+  if (!THEME_PRESETS[name]) return;
+  state.settings.themePreset = name;
+  state.settings.themeMode = els.themeMode?.value || state.settings.themeMode || "dark";
+  const theme = currentTheme();
+  state.settings.animationType = theme.animationType;
+  state.settings.animationIntensity = theme.animationIntensity;
+  state.settings.animationSpeed = theme.animationSpeed;
+  state.settings.backgroundDim = theme.backgroundDim;
+  state.settings.backgroundBlur = theme.backgroundBlur;
+  state.settings.panelOpacity = theme.panelOpacity;
+  state.settings.wallpaperProvider = theme.wallpaperProvider || state.settings.wallpaperProvider;
+  state.settings.wallpaperTags = theme.wallpaperTags || state.settings.wallpaperTags;
+  saveState();
+  bindSettingsToInputs();
+  applyThemePalette();
+  applyWallpaper();
+  resetFx();
+  renderTimer();
+  if (notifyUser) notify(`Tema aplicado: ${theme.name}`);
+  if (fetchWallpaper) fetchRandomWallpaper(true);
+}
+
 function currentTheme() {
   return THEME_PRESETS[state.settings.themePreset] || THEME_PRESETS.dark_academic || THEME_PRESETS.japanese;
 }
@@ -2918,6 +3392,7 @@ function bindSettingsToInputs() {
         const s = state.settings;
         els.wallpaperUrl.value = s.wallpaperMode === "url" ? s.wallpaperUrl : "";
         els.themePreset.value = THEME_PRESETS[s.themePreset] ? s.themePreset : "dark_academic";
+        els.themeMode.value = s.themeMode || "dark";
         els.wallpaperProvider.value = s.wallpaperProvider;
         els.wallpaperRotate.value = s.wallpaperRotate;
         els.wallpaperTags.value = s.wallpaperTags;
@@ -2938,6 +3413,7 @@ function bindSettingsToInputs() {
         els.alarmVolume.value = s.alarmVolume;
         els.notificationsEnabled.checked = s.notificationsEnabled;
         els.panelOpacity.value = s.panelOpacity;
+        els.panelBlur.value = s.panelBlur ?? 6;
         els.uiDensity.value = s.uiDensity || "medium";
         applyUiDensity();
         updateSettingLabels();
@@ -2957,6 +3433,7 @@ function bindSettingsToInputs() {
         els.animationSpeedValue.textContent = `${state.settings.animationSpeed}%`;
         els.alarmVolumeValue.textContent = `${state.settings.alarmVolume}%`;
         els.panelOpacityValue.textContent = `${state.settings.panelOpacity}%`;
+        els.panelBlurValue.textContent = `${state.settings.panelBlur ?? 0} px`;
       }
 
       function updateCredit() {
@@ -2993,7 +3470,13 @@ function bindSettingsToInputs() {
       async function applyWallpaper() {
         const s = state.settings;
         applyThemePalette();
-        document.documentElement.style.setProperty("--panel-opacity", Math.max(.58, Math.min(1, s.panelOpacity / 100)));
+        const panelOpacity = Math.max(0, Math.min(1, Number(s.panelOpacity) / 100));
+        const panelBlur = Math.max(0, Math.min(24, Number(s.panelBlur ?? 6)));
+        document.documentElement.style.setProperty("--panel-opacity", panelOpacity);
+        document.documentElement.style.setProperty("--panel-blur", `${panelBlur}px`);
+        document.documentElement.style.setProperty("--panel-border-opacity", Math.min(.44, Math.max(.04, panelOpacity * .44)));
+        document.documentElement.style.setProperty("--panel-shadow-opacity", Math.min(.28, Math.max(0, panelOpacity * .28)));
+        document.body.classList.toggle("low-panel-opacity", panelOpacity < .22);
         els.backgroundShade.style.background = `rgba(5, 9, 7, ${s.backgroundDim / 100})`;
         els.backgroundShade.style.backdropFilter = `blur(${s.backgroundBlur}px)`;
         applyWallpaperLayout();
@@ -3042,6 +3525,7 @@ function bindSettingsToInputs() {
       function saveVisualSettings() {
         const s = state.settings;
         s.themePreset = els.themePreset.value;
+        s.themeMode = els.themeMode.value;
         s.wallpaperProvider = els.wallpaperProvider.value;
         s.wallpaperRotate = els.wallpaperRotate.value;
         s.wallpaperTags = els.wallpaperTags.value.trim();
@@ -3060,6 +3544,7 @@ function bindSettingsToInputs() {
         s.alarmVolume = Number(els.alarmVolume.value);
         s.notificationsEnabled = els.notificationsEnabled.checked;
         s.panelOpacity = Number(els.panelOpacity.value);
+        s.panelBlur = Number(els.panelBlur.value);
         s.uiDensity = els.uiDensity.value;
         applyUiDensity();
         saveState();
@@ -3672,6 +4157,12 @@ function bindSettingsToInputs() {
       }
 
 
+      els.togglePomodoro.addEventListener("click", () => {
+        state.settings.pomodoroVisible = state.settings.pomodoroVisible === false;
+        saveState();
+        applyUiDensity();
+      });
+
       els.addFavorite.addEventListener("click", () => openFavoriteDialog());
       els.openSiteFinder.addEventListener("click", () => {
         renderSiteFinder();
@@ -3683,6 +4174,8 @@ function bindSettingsToInputs() {
         els.siteFinderDialog.close();
         openFavoriteDialog();
       });
+      els.searchNewSites.addEventListener("click", () => openExternalSiteSearch());
+
       els.clearSiteFinder.addEventListener("click", () => {
         els.siteFinderInput.value = "";
         activeSiteCategory = "todos";
@@ -3697,9 +4190,12 @@ function bindSettingsToInputs() {
         renderSiteFinder();
       });
       els.siteFinderList.addEventListener("click", event => {
-        const button = event.target.closest("[data-action='catalog-add']");
+        const button = event.target.closest("[data-action]");
         if (!button) return;
-        addCatalogSite(button.dataset.site);
+        const action = button.dataset.action;
+        if (action === "catalog-add") addCatalogSite(button.dataset.site);
+        if (action === "online-search") openExternalSiteSearch();
+        if (action === "add-query-domain") addQueryDomainAsFavorite();
       });
       els.favoriteUrl.addEventListener("input", updateFavoriteAutofill);
       els.cancelFavorite.addEventListener("click", () => els.favoriteDialog.close());
@@ -3906,6 +4402,34 @@ function bindSettingsToInputs() {
       });
 
       els.themePreset.addEventListener("change", () => {
+        state.settings.themePreset = els.themePreset.value;
+        saveState();
+        updateThemeDescription();
+      });
+
+      els.themeMode.addEventListener("change", () => {
+        state.settings.themeMode = els.themeMode.value;
+        saveState();
+        updateThemeDescription();
+        applyThemePalette();
+        applyWallpaper();
+      });
+
+      els.themeSearch.addEventListener("input", renderThemeBrowser);
+
+      els.themeCategoryChips.addEventListener("click", event => {
+        const button = event.target.closest("[data-theme-category]");
+        if (!button) return;
+        activeThemeCategory = button.dataset.themeCategory;
+        renderThemeBrowser();
+      });
+
+      els.themeCardGrid.addEventListener("click", event => {
+        const button = event.target.closest("[data-theme-key]");
+        if (!button) return;
+        els.themePreset.value = button.dataset.themeKey;
+        state.settings.themePreset = button.dataset.themeKey;
+        saveState();
         updateThemeDescription();
       });
 
@@ -3966,12 +4490,12 @@ function bindSettingsToInputs() {
       });
 
       [
-        els.themePreset,
+        els.themePreset, els.themeMode,
         els.wallpaperProvider, els.wallpaperRotate, els.wallpaperTags, els.wallpaperFit,
         els.wallpaperZoom, els.wallpaperFocusX, els.wallpaperFocusY, els.adultRating,
         els.backgroundDim, els.backgroundBlur, els.animationType, els.animationIntensity,
         els.animationSpeed, els.alarmTone, els.alarmRepeats, els.alarmVolume,
-        els.notificationsEnabled, els.panelOpacity, els.uiDensity
+        els.notificationsEnabled, els.panelOpacity, els.panelBlur, els.uiDensity
       ].forEach(element => {
         element.addEventListener(element.type === "range" ? "input" : "change", saveVisualSettings);
       });
