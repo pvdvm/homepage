@@ -318,6 +318,369 @@
       color: var(--ink);
     }
 
+
+    .favorites-panel {
+      max-width: 860px;
+      margin: -8px auto 22px;
+      padding: 14px;
+      border-radius: 24px;
+      background: rgba(244, 239, 226, calc(var(--panel-opacity) - .10));
+      border: 1px solid rgba(255,255,255,.34);
+      box-shadow: 0 18px 55px rgba(9, 13, 11, 0.20);
+      backdrop-filter: blur(18px);
+      color: var(--ink);
+    }
+
+    .favorites-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 0 2px 12px;
+    }
+
+    .favorites-head h2 {
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 1.08rem;
+      font-weight: 500;
+    }
+
+    .favorite-actions,
+    .finder-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+
+    .mini-button {
+      border-radius: 999px;
+      padding: 9px 12px;
+      background: rgba(23,25,22,.08);
+      color: var(--ink);
+      font-weight: 800;
+      font-size: .78rem;
+    }
+
+    .mini-button.accent { background: var(--red); color: white; }
+    .mini-button:hover { background: rgba(23,25,22,.13); }
+    .mini-button.accent:hover { filter: brightness(.95); }
+
+    .favorites-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 10px;
+    }
+
+    .favorite-item {
+      position: relative;
+      min-width: 0;
+    }
+
+    .favorite-link {
+      min-height: 64px;
+      display: grid;
+      grid-template-columns: 34px minmax(0, 1fr);
+      align-items: center;
+      gap: 10px;
+      color: inherit;
+      text-decoration: none;
+      border-radius: 17px;
+      padding: 10px 34px 10px 10px;
+      background: rgba(255,255,255,.42);
+      border: 1px solid rgba(23,25,22,.08);
+      transition: transform .18s ease, background .18s ease, border-color .18s ease;
+    }
+
+    .favorite-link:hover {
+      transform: translateY(-1px);
+      background: rgba(255,255,255,.58);
+      border-color: rgba(182,66,58,.22);
+    }
+
+    .favorite-icon,
+    .site-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      background: rgba(23,25,22,.08);
+      object-fit: contain;
+      padding: 4px;
+    }
+
+    .favorite-name,
+    .site-name {
+      display: block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-weight: 850;
+      font-size: .86rem;
+    }
+
+    .favorite-domain,
+    .site-url,
+    .favorite-autofill {
+      display: block;
+      margin-top: 2px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      color: rgba(23,25,22,.55);
+      font-size: .72rem;
+    }
+
+    .favorite-tools {
+      position: absolute;
+      right: 6px;
+      top: 6px;
+      display: flex;
+      gap: 3px;
+      opacity: .42;
+      transition: opacity .18s ease;
+    }
+
+    .favorite-item:hover .favorite-tools { opacity: 1; }
+
+    .favorite-tool {
+      width: 23px;
+      height: 23px;
+      display: grid;
+      place-items: center;
+      border-radius: 8px;
+      background: rgba(23,25,22,.08);
+      color: rgba(23,25,22,.72);
+      font-size: .78rem;
+    }
+
+    .favorite-empty {
+      grid-column: 1 / -1;
+      padding: 18px 14px;
+      border: 1px dashed rgba(23,25,22,.16);
+      border-radius: 17px;
+      color: rgba(23,25,22,.58);
+      text-align: center;
+      line-height: 1.45;
+    }
+
+    dialog.wide-dialog { width: min(880px, calc(100% - 28px)); }
+
+    .finder-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+
+    .finder-tools {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .category-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin: 0 0 14px;
+    }
+
+    .category-chip {
+      border-radius: 999px;
+      padding: 7px 10px;
+      background: rgba(23,25,22,.07);
+      color: rgba(23,25,22,.70);
+      font-size: .76rem;
+      font-weight: 800;
+    }
+
+    .category-chip.active {
+      background: var(--red);
+      color: white;
+    }
+
+    .site-finder-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 10px;
+      max-height: min(55vh, 520px);
+      overflow: auto;
+      padding-right: 3px;
+    }
+
+    .site-row {
+      display: grid;
+      grid-template-columns: 34px minmax(0, 1fr) auto;
+      gap: 10px;
+      align-items: center;
+      padding: 11px;
+      border-radius: 16px;
+      background: rgba(255,255,255,.42);
+      border: 1px solid rgba(23,25,22,.08);
+    }
+
+    .site-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-top: 5px;
+    }
+
+    .site-tag {
+      border-radius: 999px;
+      background: rgba(23,25,22,.07);
+      padding: 3px 7px;
+      color: rgba(23,25,22,.58);
+      font-size: .66rem;
+      font-weight: 750;
+    }
+
+    .finder-empty {
+      display: none;
+      padding: 22px;
+      text-align: center;
+      color: rgba(23,25,22,.58);
+    }
+
+    .finder-empty.visible { display: block; }
+
+    body.theme-dark-ui {
+      color-scheme: dark;
+    }
+
+    body.theme-dark-ui .card,
+    body.theme-dark-ui .favorites-panel,
+    body.theme-dark-ui .search-shell {
+      background: rgba(16, 22, 28, var(--panel-opacity));
+      border-color: rgba(238,245,255,.12);
+      color: var(--ink);
+      box-shadow: 0 24px 80px rgba(0,0,0,.42);
+    }
+
+    body.theme-dark-ui dialog,
+    body.theme-dark-ui .settings-drawer {
+      background: #111820;
+      color: var(--ink);
+      border: 1px solid rgba(238,245,255,.11);
+    }
+
+    body.theme-dark-ui .drawer-head {
+      background: rgba(17,24,32,.94);
+      border-bottom-color: rgba(238,245,255,.10);
+    }
+
+    body.theme-dark-ui .settings-section,
+    body.theme-dark-ui .theme-preview,
+    body.theme-dark-ui .favorite-link,
+    body.theme-dark-ui .site-row {
+      background: rgba(255,255,255,.055);
+      border-color: rgba(238,245,255,.10);
+    }
+
+    body.theme-dark-ui .field,
+    body.theme-dark-ui .search-shell select,
+    body.theme-dark-ui .setting input[type="text"],
+    body.theme-dark-ui .setting input[type="url"],
+    body.theme-dark-ui .setting input[type="number"],
+    body.theme-dark-ui .setting select,
+    body.theme-dark-ui .duration-edit input {
+      background: rgba(255,255,255,.075);
+      border-color: rgba(238,245,255,.14);
+      color: var(--ink);
+    }
+
+    body.theme-dark-ui .field::placeholder,
+    body.theme-dark-ui .search-shell input::placeholder { color: rgba(232,238,242,.44); }
+
+    body.theme-dark-ui .favorite-link:hover,
+    body.theme-dark-ui .task:hover {
+      background: rgba(255,255,255,.085);
+      border-color: rgba(139,184,255,.22);
+    }
+
+    body.theme-dark-ui .secondary,
+    body.theme-dark-ui .ghost:hover,
+    body.theme-dark-ui .mini-button,
+    body.theme-dark-ui .category-chip,
+    body.theme-dark-ui .favorite-tool,
+    body.theme-dark-ui .close-settings {
+      background: rgba(255,255,255,.08);
+      color: var(--ink);
+    }
+
+    body.theme-dark-ui .favorite-domain,
+    body.theme-dark-ui .site-url,
+    body.theme-dark-ui .site-tag,
+    body.theme-dark-ui .favorite-autofill,
+    body.theme-dark-ui .settings-section .help,
+    body.theme-dark-ui .setting > label,
+    body.theme-dark-ui .setting-label,
+    body.theme-dark-ui .value-line,
+    body.theme-dark-ui .modal label,
+    body.theme-dark-ui .task-meta,
+    body.theme-dark-ui .duration-edit,
+    body.theme-dark-ui .alarm-label,
+    body.theme-dark-ui .empty,
+    body.theme-dark-ui .favorite-empty,
+    body.theme-dark-ui .finder-empty {
+      color: rgba(232,238,242,.62);
+    }
+
+    body.theme-dark-ui .progress-ring::before,
+    body.theme-dark-ui .enso {
+      background: #111820;
+    }
+
+    body.theme-dark-ui .enso {
+      background:
+        radial-gradient(circle, rgba(17,24,32,1) 0 58%, transparent 59%),
+        conic-gradient(from -90deg, var(--red) var(--timer-p, 0deg), rgba(238,245,255,.10) 0);
+    }
+
+    body.theme-dark-ui .eyebrow,
+    body.theme-dark-ui .timer-kicker,
+    body.theme-dark-ui .theme-preview strong { color: var(--red-deep); }
+
+    body.theme-dark-ui .start { background: #e8eef2; color: #10161c; }
+
+    body.density-compact .app { width: min(980px, calc(100% - 20px)); padding: 16px 0 34px; }
+    body.density-compact .topbar { margin-bottom: 14px; gap: 14px; }
+    body.density-compact .mon { width: 42px; height: 42px; }
+    body.density-compact .brand h1 { font-size: clamp(1.08rem, 2.4vw, 1.55rem); }
+    body.density-compact .brand small { font-size: .58rem; }
+    body.density-compact .clock-time { font-size: clamp(1.55rem, 4vw, 3.2rem); }
+    body.density-compact .settings-button { width: 40px; }
+    body.density-compact .search-shell { max-width: 650px; margin-bottom: 14px; padding: 4px 6px 4px 14px; }
+    body.density-compact .search-shell input { padding: 9px 10px; }
+    body.density-compact .search-shell select { padding: 8px 9px; }
+    body.density-compact .favorites-panel { max-width: 720px; margin-bottom: 14px; padding: 10px; border-radius: 18px; }
+    body.density-compact .favorites-head { padding-bottom: 8px; }
+    body.density-compact .favorite-link { min-height: 52px; padding-block: 8px; border-radius: 13px; }
+    body.density-compact .grid { grid-template-columns: minmax(0, 1.35fr) minmax(260px, .65fr); gap: 12px; }
+    body.density-compact .card { border-radius: 18px; }
+    body.density-compact .card-header { padding: 15px 17px 11px; }
+    body.density-compact .add-task { padding: 13px 17px; gap: 8px; }
+    body.density-compact .field { padding: 9px 10px; border-radius: 11px; }
+    body.density-compact .tasks { max-height: 430px; padding: 6px 8px 10px; }
+    body.density-compact .task { padding: 9px; border-radius: 13px; }
+    body.density-compact .timer-card { padding: 17px; }
+    body.density-compact .enso { width: min(190px, 60vw); }
+    body.density-compact .timer-time { font-size: clamp(2.1rem, 6vw, 3.2rem); }
+    body.density-compact .quote-card { padding: 16px; }
+    body.density-compact .settings-section { padding: 13px; border-radius: 14px; }
+    body.density-compact .settings-content { padding: 14px 15px 30px; }
+
+    body.density-comfortable .app { width: min(1260px, calc(100% - 42px)); padding-top: 34px; }
+    body.density-comfortable .search-shell { max-width: 840px; }
+    body.density-comfortable .favorites-panel { max-width: 940px; }
+    body.density-comfortable .grid { gap: 26px; }
+    body.density-comfortable .card-header { padding: 26px 28px 18px; }
+    body.density-comfortable .timer-card { padding: 30px; }
+
     .grid {
       display: grid;
       grid-template-columns: minmax(0, 1.45fr) minmax(300px, .75fr);
@@ -1097,6 +1460,11 @@
       .timer-card { padding: 22px 16px; }
       .setting-grid { grid-template-columns: 1fr; }
       .settings-content { padding-inline: 13px; }
+      .favorites-head, .finder-top { align-items: stretch; flex-direction: column; }
+      .favorite-actions, .finder-actions { justify-content: stretch; }
+      .favorite-actions .mini-button, .finder-actions .mini-button { flex: 1; }
+      .finder-tools { grid-template-columns: 1fr; }
+      .site-finder-list { grid-template-columns: 1fr; max-height: 58vh; }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -1152,6 +1520,21 @@
         <option value="wikipedia">Wikipédia</option>
       </select>
     </form>
+
+
+    <section class="favorites-panel" aria-labelledby="favoritesTitle">
+      <div class="favorites-head">
+        <div>
+          <p class="eyebrow">お気に入り · acesso rápido</p>
+          <h2 id="favoritesTitle">Sites favoritos</h2>
+        </div>
+        <div class="favorite-actions">
+          <button class="mini-button accent" id="addFavorite" type="button">+ Favorito</button>
+          <button class="mini-button" id="openSiteFinder" type="button">Explorar por categoria</button>
+        </div>
+      </div>
+      <div class="favorites-list" id="favoriteList"></div>
+    </section>
 
     <section class="grid">
       <article class="card">
@@ -1244,6 +1627,50 @@
     </form>
   </dialog>
 
+  <dialog id="favoriteDialog">
+    <form class="modal" id="favoriteForm">
+      <h3 id="favoriteDialogTitle">Adicionar favorito</h3>
+      <label for="favoriteUrl">URL do site</label>
+      <input class="field" id="favoriteUrl" type="text" placeholder="https://exemplo.com" required />
+      <div class="favorite-autofill" id="favoriteAutofillHint">O favicon e o nome serão sugeridos automaticamente.</div>
+
+      <label for="favoriteName">Nome</label>
+      <input class="field" id="favoriteName" maxlength="60" placeholder="Automático se ficar vazio" />
+
+      <label for="favoriteCategory">Categoria</label>
+      <input class="field" id="favoriteCategory" maxlength="40" placeholder="ex.: tecnologia, jogos, estudo" />
+
+      <div class="modal-actions">
+        <button class="secondary" type="button" id="cancelFavorite">Cancelar</button>
+        <button class="primary" type="submit">Salvar favorito</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="siteFinderDialog" class="wide-dialog">
+    <div class="modal">
+      <div class="finder-top">
+        <div>
+          <p class="eyebrow">探す · catálogo rápido</p>
+          <h3>Encontrar sites por categoria</h3>
+        </div>
+        <div class="finder-actions">
+          <button class="mini-button accent" id="finderManualFavorite" type="button">Inserir manualmente</button>
+          <button class="close-settings" id="closeSiteFinder" type="button" aria-label="Fechar catálogo">×</button>
+        </div>
+      </div>
+
+      <div class="finder-tools">
+        <input class="field" id="siteFinderInput" placeholder="Pesquise: tecnologia, jogos, linux, programação..." autocomplete="off" />
+        <button class="mini-button" type="button" id="clearSiteFinder">Limpar busca</button>
+      </div>
+
+      <div class="category-chips" id="siteCategoryChips" aria-label="Categorias de sites"></div>
+      <div class="site-finder-list" id="siteFinderList"></div>
+      <div class="finder-empty" id="siteFinderEmpty">Nada encontrado. Tente outra palavra ou insira manualmente.</div>
+    </div>
+  </dialog>
+
   <div class="drawer-backdrop" id="drawerBackdrop"></div>
   <aside class="settings-drawer" id="settingsDrawer" aria-label="Configurações">
     <div class="drawer-head">
@@ -1262,6 +1689,7 @@
   <div class="setting">
     <label for="themePreset">Tema</label>
     <select id="themePreset">
+      <option value="dark_academic">Escuro acadêmico</option>
       <option value="japanese">Japonês clássico</option>
       <option value="hacker">Hacker terminal</option>
       <option value="lain">Wired / Lain</option>
@@ -1516,10 +1944,21 @@
       </section>
 
       <section class="settings-section">
-        <h3>Aparência dos painéis</h3>
-        <div class="setting">
-          <div class="value-line"><label for="panelOpacity">Opacidade</label><span id="panelOpacityValue">92%</span></div>
-          <input id="panelOpacity" type="range" min="58" max="100" value="92" />
+        <h3>Aparência da interface</h3>
+        <p class="help">Controle o tamanho geral da tela e a força visual dos painéis.</p>
+        <div class="setting-grid">
+          <div class="setting">
+            <label for="uiDensity">Tamanho</label>
+            <select id="uiDensity">
+              <option value="compact">Compactada</option>
+              <option value="medium">Média</option>
+              <option value="comfortable">Espaçosa</option>
+            </select>
+          </div>
+          <div class="setting">
+            <div class="value-line"><label for="panelOpacity">Opacidade</label><span id="panelOpacityValue">88%</span></div>
+            <input id="panelOpacity" type="range" min="58" max="100" value="88" />
+          </div>
         </div>
       </section>
 
@@ -1557,7 +1996,7 @@
         wallpaperUrl: "",
         wallpaperCreditUrl: "",
         wallpaperProvider: "auto",
-        wallpaperTags: "scenery",
+        wallpaperTags: "library night desk computer rain",
         wallpaperRotate: "off",
         wallpaperFit: "smart",
         wallpaperPosition: "center",
@@ -1567,24 +2006,26 @@
         adultMode: false,
         adultRating: "questionable",
         adultConfirmed: false,
-        themePreset: "japanese",
-        backgroundDim: 34,
+        themePreset: "dark_academic",
+        backgroundDim: 46,
         backgroundBlur: 0,
-        animationType: "sakura",
-        animationIntensity: "medium",
-        animationSpeed: 100,
+        animationType: "stars",
+        animationIntensity: "low",
+        animationSpeed: 78,
         alarmTone: "temple",
         alarmRepeats: 2,
         alarmVolume: 70,
         notificationsEnabled: true,
         customAlarmName: "",
-        panelOpacity: 92,
+        panelOpacity: 88,
+        uiDensity: "medium",
         lastWallpaperFetch: "",
         lastWallpaperDay: ""
       };
 
       
 const THEME_PRESETS = {
+  dark_academic: { name: "escuro acadêmico", symbol: "宵", description: "Tema escuro limpo, com painéis compactos, contraste confortável e clima de estudo noturno.", recommendedAnimation: "stars", wallpaperTags: "library night desk computer rain", wallpaperProvider: "auto", palette: { ink: "#e8eef2", red: "#8bb8ff", redDeep: "#b8d2ff", moss: "#84c6a1", gold: "#e6c781" }, bodyBg: "#05070a", sceneBackground: "linear-gradient(180deg, rgba(5, 7, 10, 0.08), rgba(5, 7, 10, 0.66)), radial-gradient(circle at 73% 16%, rgba(139,184,255,0.18) 0 10%, transparent 29%), linear-gradient(145deg, #14202c 0%, #0b1118 48%, #05070a 100%)", sunBackground: "radial-gradient(circle at 36% 32%, #f0f6ff 0%, #8bb8ff 48%, #2d4668 100%)", overlayStyle: "opacity:.16;background:linear-gradient(180deg, rgba(139,184,255,.09), transparent 38%), radial-gradient(circle at 18% 16%, rgba(230,199,129,.09), transparent 24%);", animationType: "stars", animationIntensity: "low", animationSpeed: 78, backgroundDim: 46, backgroundBlur: 0, panelOpacity: 88, darkPanels: true },
   japanese: { name: "japonês clássico", symbol: "日", description: "Visual tranquilo com papel, vermelho tradicional, sakura e atmosfera contemplativa.", recommendedAnimation: "sakura", wallpaperTags: "scenery shrine temple sunset japan", wallpaperProvider: "auto", palette: { ink: "#171916", red: "#b6423a", redDeep: "#74312d", moss: "#495c4a", gold: "#c39a5a" }, bodyBg: "#0d1513", sceneBackground: "linear-gradient(180deg, rgba(11, 18, 16, 0.12), rgba(11, 18, 16, 0.52)), radial-gradient(circle at 75% 17%, rgba(238, 197, 141, 0.23) 0 10%, transparent 28%), linear-gradient(140deg, #24362f 0%, #15231f 45%, #0d1513 100%)", sunBackground: "radial-gradient(circle at 36% 32%, #f5ddba 0%, #dba267 47%, #b85a42 100%)", overlayStyle: "", animationType: "sakura", animationIntensity: "medium", animationSpeed: 100, backgroundDim: 34, backgroundBlur: 0, panelOpacity: 92 },
   hacker: { name: "hacker terminal", symbol: "電", description: "Verde terminal, scanlines e clima de console obscuro.", recommendedAnimation: "matrix", wallpaperTags: "computer server circuit city night neon", wallpaperProvider: "auto", palette: { ink: "#051208", red: "#3cf281", redDeep: "#1f8e4b", moss: "#166639", gold: "#8fffb5" }, bodyBg: "#020b05", sceneBackground: "linear-gradient(180deg, rgba(4, 12, 7, 0.10), rgba(4, 12, 7, 0.58)), radial-gradient(circle at 70% 18%, rgba(67, 255, 161, 0.09) 0 10%, transparent 30%), linear-gradient(140deg, #07120d 0%, #030805 45%, #010402 100%)", sunBackground: "radial-gradient(circle at 36% 32%, #b5ffd1 0%, #34db78 47%, #0b5b2e 100%)", overlayStyle: "opacity:.28;mix-blend-mode:screen;background:repeating-linear-gradient(to bottom, rgba(120,255,160,.09) 0 2px, transparent 2px 5px), linear-gradient(90deg, rgba(0,255,150,.06), transparent 32%, rgba(0,255,150,.03) 67%, transparent);", animationType: "matrix", animationIntensity: "high", animationSpeed: 115, backgroundDim: 42, backgroundBlur: 0, panelOpacity: 88 },
   lain: { name: "wired / lain", symbol: "線", description: "Tons frios, ruído digital e a sensação de estar conectado ao Wired.", recommendedAnimation: "glitch", wallpaperTags: "night city wires power_lines computer monochrome", wallpaperProvider: "auto", palette: { ink: "#101513", red: "#89d0b3", redDeep: "#4a7768", moss: "#5a7a72", gold: "#cfdad3" }, bodyBg: "#070909", sceneBackground: "linear-gradient(180deg, rgba(6, 8, 8, 0.18), rgba(6, 8, 8, 0.66)), radial-gradient(circle at 72% 20%, rgba(179, 255, 221, 0.08) 0 8%, transparent 30%), linear-gradient(140deg, #101515 0%, #0a0c0c 46%, #050707 100%)", sunBackground: "radial-gradient(circle at 36% 32%, #d7e9df 0%, #9fc8b4 48%, #49645b 100%)", overlayStyle: "opacity:.34;mix-blend-mode:screen;background:repeating-linear-gradient(to bottom, rgba(255,255,255,.05) 0 1px, transparent 1px 4px), linear-gradient(90deg, rgba(125,255,185,.07), rgba(255,255,255,0) 40%, rgba(125,255,185,.05));", animationType: "glitch", animationIntensity: "medium", animationSpeed: 100, backgroundDim: 46, backgroundBlur: 1, panelOpacity: 90 },
@@ -1605,6 +2046,78 @@ const THEME_PRESETS = {
   winter_monastery: { name: "mosteiro de inverno", symbol: "雪", description: "Neve, pedra fria e silêncio contemplativo em tons claros.", recommendedAnimation: "snow", wallpaperTags: "snow temple monastery winter mountains", wallpaperProvider: "auto", palette: { ink: "#243039", red: "#7c9aaa", redDeep: "#5a7382", moss: "#7d8f95", gold: "#dbe8ef" }, bodyBg: "#0e1820", sceneBackground: "linear-gradient(180deg, rgba(14, 24, 32, 0.04), rgba(14, 24, 32, 0.42)), radial-gradient(circle at 73% 16%, rgba(255, 255, 255, 0.26) 0 9%, transparent 29%), linear-gradient(150deg, #5e7b8b 0%, #243542 46%, #10171d 100%)", sunBackground: "radial-gradient(circle at 36% 32%, #ffffff 0%, #d8e7ef 47%, #87a6b8 100%)", overlayStyle: "opacity:.12;background:linear-gradient(180deg, rgba(255,255,255,.08), transparent 26%);", animationType: "snow", animationIntensity: "medium", animationSpeed: 72, backgroundDim: 20, backgroundBlur: 0, panelOpacity: 95 }
 };
 
+
+      const SITE_CATALOG = [
+        { id: "github", name: "GitHub", url: "https://github.com", category: "programação", tags: ["tecnologia", "código", "open source"] },
+        { id: "stackoverflow", name: "Stack Overflow", url: "https://stackoverflow.com", category: "programação", tags: ["dúvidas", "código", "desenvolvimento"] },
+        { id: "mdn", name: "MDN Web Docs", url: "https://developer.mozilla.org/pt-BR/", category: "programação", tags: ["javascript", "web", "documentação"] },
+        { id: "freecodecamp", name: "freeCodeCamp", url: "https://www.freecodecamp.org", category: "programação", tags: ["curso", "web", "prática"] },
+        { id: "devto", name: "DEV Community", url: "https://dev.to", category: "programação", tags: ["artigos", "dev", "comunidade"] },
+        { id: "hackernews", name: "Hacker News", url: "https://news.ycombinator.com", category: "tecnologia", tags: ["startups", "programação", "notícias"] },
+        { id: "theverge", name: "The Verge", url: "https://www.theverge.com", category: "tecnologia", tags: ["notícias", "gadgets", "cultura digital"] },
+        { id: "wired", name: "WIRED", url: "https://www.wired.com", category: "tecnologia", tags: ["ciência", "tecnologia", "cultura"] },
+        { id: "arstechnica", name: "Ars Technica", url: "https://arstechnica.com", category: "tecnologia", tags: ["tecnologia", "ciência", "análise"] },
+        { id: "techcrunch", name: "TechCrunch", url: "https://techcrunch.com", category: "tecnologia", tags: ["startups", "negócios", "notícias"] },
+        { id: "steam", name: "Steam", url: "https://store.steampowered.com", category: "jogos", tags: ["loja", "pc", "games"] },
+        { id: "epicgames", name: "Epic Games Store", url: "https://store.epicgames.com/pt-BR/", category: "jogos", tags: ["loja", "pc", "games grátis"] },
+        { id: "gog", name: "GOG", url: "https://www.gog.com", category: "jogos", tags: ["loja", "drm-free", "pc"] },
+        { id: "itchio", name: "itch.io", url: "https://itch.io", category: "jogos", tags: ["indie", "loja", "criadores"] },
+        { id: "protondb", name: "ProtonDB", url: "https://www.protondb.com", category: "jogos", tags: ["linux", "steam", "compatibilidade"] },
+        { id: "pcgw", name: "PCGamingWiki", url: "https://www.pcgamingwiki.com", category: "jogos", tags: ["ajustes", "pc", "wiki"] },
+        { id: "hltb", name: "HowLongToBeat", url: "https://howlongtobeat.com", category: "jogos", tags: ["tempo", "backlog", "games"] },
+        { id: "khan", name: "Khan Academy", url: "https://pt.khanacademy.org", category: "estudos", tags: ["matemática", "curso", "aprendizado"] },
+        { id: "cs50", name: "CS50", url: "https://cs50.harvard.edu/x/", category: "estudos", tags: ["harvard", "programação", "ciência da computação"] },
+        { id: "mitocw", name: "MIT OpenCourseWare", url: "https://ocw.mit.edu", category: "estudos", tags: ["faculdade", "curso", "engenharia"] },
+        { id: "coursera", name: "Coursera", url: "https://www.coursera.org", category: "estudos", tags: ["curso", "certificado", "faculdade"] },
+        { id: "edx", name: "edX", url: "https://www.edx.org", category: "estudos", tags: ["curso", "universidade", "certificado"] },
+        { id: "wikipedia", name: "Wikipédia", url: "https://pt.wikipedia.org", category: "estudos", tags: ["enciclopédia", "referência", "pesquisa"] },
+        { id: "wolfram", name: "WolframAlpha", url: "https://www.wolframalpha.com", category: "estudos", tags: ["matemática", "cálculo", "respostas"] },
+        { id: "anki", name: "AnkiWeb", url: "https://ankiweb.net", category: "estudos", tags: ["flashcards", "memória", "revisão"] },
+        { id: "archwiki", name: "ArchWiki", url: "https://wiki.archlinux.org", category: "linux", tags: ["arch", "documentação", "sistema"] },
+        { id: "kde", name: "KDE", url: "https://kde.org", category: "linux", tags: ["plasma", "desktop", "linux"] },
+        { id: "gnome", name: "GNOME", url: "https://www.gnome.org", category: "linux", tags: ["desktop", "linux", "software livre"] },
+        { id: "flathub", name: "Flathub", url: "https://flathub.org", category: "linux", tags: ["apps", "flatpak", "linux"] },
+        { id: "phoronix", name: "Phoronix", url: "https://www.phoronix.com", category: "linux", tags: ["notícias", "benchmarks", "hardware"] },
+        { id: "chatgpt", name: "ChatGPT", url: "https://chatgpt.com", category: "ia", tags: ["inteligência artificial", "assistente", "produtividade"] },
+        { id: "huggingface", name: "Hugging Face", url: "https://huggingface.co", category: "ia", tags: ["modelos", "datasets", "machine learning"] },
+        { id: "paperswithcode", name: "Papers with Code", url: "https://paperswithcode.com", category: "ia", tags: ["artigos", "código", "pesquisa"] },
+        { id: "arxiv", name: "arXiv", url: "https://arxiv.org", category: "ia", tags: ["papers", "ciência", "pesquisa"] },
+        { id: "figma", name: "Figma", url: "https://www.figma.com", category: "design", tags: ["ui", "ux", "protótipo"] },
+        { id: "dribbble", name: "Dribbble", url: "https://dribbble.com", category: "design", tags: ["inspiração", "ui", "portfólio"] },
+        { id: "behance", name: "Behance", url: "https://www.behance.net", category: "design", tags: ["portfólio", "inspiração", "criatividade"] },
+        { id: "coolors", name: "Coolors", url: "https://coolors.co", category: "design", tags: ["cores", "paleta", "inspiração"] },
+        { id: "fonts", name: "Google Fonts", url: "https://fonts.google.com", category: "design", tags: ["fontes", "tipografia", "web"] },
+        { id: "youtube", name: "YouTube", url: "https://www.youtube.com", category: "vídeos", tags: ["aulas", "entretenimento", "canais"] },
+        { id: "twitch", name: "Twitch", url: "https://www.twitch.tv", category: "vídeos", tags: ["lives", "jogos", "streaming"] },
+        { id: "internetarchive", name: "Internet Archive", url: "https://archive.org", category: "livros", tags: ["biblioteca", "arquivos", "pesquisa"] },
+        { id: "gutenberg", name: "Project Gutenberg", url: "https://www.gutenberg.org", category: "livros", tags: ["domínio público", "ebooks", "clássicos"] },
+        { id: "qconcursos", name: "Qconcursos", url: "https://www.qconcursos.com", category: "concursos", tags: ["questões", "provas", "estudo"] },
+        { id: "pciconcursos", name: "PCI Concursos", url: "https://www.pciconcursos.com.br", category: "concursos", tags: ["editais", "vagas", "provas"] },
+        { id: "jusbrasil", name: "Jusbrasil", url: "https://www.jusbrasil.com.br", category: "direito", tags: ["jurisprudência", "leis", "pesquisa"] },
+        { id: "planalto", name: "Planalto", url: "https://www.planalto.gov.br/ccivil_03/", category: "direito", tags: ["leis", "constituição", "oficial"] }
+      ];
+
+      const SITE_NAME_OVERRIDES = {
+        "github.com": "GitHub",
+        "stackoverflow.com": "Stack Overflow",
+        "developer.mozilla.org": "MDN Web Docs",
+        "youtube.com": "YouTube",
+        "youtu.be": "YouTube",
+        "wikipedia.org": "Wikipédia",
+        "pt.wikipedia.org": "Wikipédia",
+        "khanacademy.org": "Khan Academy",
+        "pt.khanacademy.org": "Khan Academy",
+        "chatgpt.com": "ChatGPT",
+        "openai.com": "OpenAI",
+        "store.steampowered.com": "Steam",
+        "steamcommunity.com": "Steam",
+        "archlinux.org": "Arch Linux",
+        "wiki.archlinux.org": "ArchWiki",
+        "kde.org": "KDE",
+        "gnome.org": "GNOME",
+        "qconcursos.com": "Qconcursos"
+      };
+
 const defaultState = {
         date: todayKey(),
         activeId: null,
@@ -1613,12 +2126,15 @@ const defaultState = {
         tasks: [
           { id: uid(), title: "Ler por 30 minutos", minutes: 30, remaining: 1800, done: false, repeat: true, running: false, lastTick: null, alarm: "default", alerted: false },
           { id: uid(), title: "Revisar o conteúdo do dia", minutes: 25, remaining: 1500, done: false, repeat: true, running: false, lastTick: null, alarm: "default", alerted: false }
-        ]
+        ],
+        favorites: []
       };
 
       const els = Object.fromEntries([
-        "clockTime","clockDate","searchForm","searchInput","searchEngine","taskForm","taskTitle",
-        "taskMinutes","taskRepeat","taskList","progressRing","progressText","clearDone","resetDay",
+        "clockTime","clockDate","searchForm","searchInput","searchEngine","favoriteList","addFavorite","openSiteFinder",
+        "favoriteDialog","favoriteForm","favoriteDialogTitle","favoriteUrl","favoriteName","favoriteCategory","favoriteAutofillHint","cancelFavorite",
+        "siteFinderDialog","closeSiteFinder","finderManualFavorite","siteFinderInput","clearSiteFinder","siteCategoryChips","siteFinderList","siteFinderEmpty",
+        "taskForm","taskTitle","taskMinutes","taskRepeat","taskList","progressRing","progressText","clearDone","resetDay",
         "focusName","timerTime","enso","toggleTimer","resetTimer","durationInput","activeAlarmLabel",
         "editDialog","editForm","editTitle","editMinutes","editAlarm","editRepeat","cancelEdit","toast",
         "openSettings","closeSettings","settingsDrawer","drawerBackdrop","wallpaperLayer","wallpaperBackdrop",
@@ -1630,12 +2146,14 @@ const defaultState = {
         "backgroundBlur","backgroundBlurValue",
         "wallpaperStatus","wallpaperCredit","animationType","animationIntensity","animationSpeed",
         "animationSpeedValue","alarmTone","alarmRepeats","alarmVolume","alarmVolumeValue","alarmFile",
-        "testAlarm","alarmFileStatus","notificationsEnabled","panelOpacity","panelOpacityValue",
+        "testAlarm","alarmFileStatus","notificationsEnabled","panelOpacity","panelOpacityValue","uiDensity",
         "exportSettings","importSettings","resetEverything"
       ].map(id => [id, document.getElementById(id)]));
 
       let state = loadState();
       let editingId = null;
+      let favoriteEditingId = null;
+      let activeSiteCategory = "todos";
       let audioContext = null;
       let autoWallpaperTimer = null;
       let customWallpaperObjectUrl = "";
@@ -1660,6 +2178,72 @@ const defaultState = {
         };
       }
 
+
+      function normalizeText(value) {
+        return String(value || "")
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .toLowerCase();
+      }
+
+      function normalizeSiteUrl(value) {
+        let raw = String(value || "").trim();
+        if (!raw) throw new Error("URL vazia");
+        if (!/^https?:\/\//i.test(raw)) raw = `https://${raw}`;
+        const url = new URL(raw);
+        if (!/^https?:$/i.test(url.protocol)) throw new Error("Protocolo inválido");
+        url.hash = "";
+        return url.toString();
+      }
+
+      function siteDomain(value) {
+        try {
+          return new URL(normalizeSiteUrl(value)).hostname.replace(/^www\./i, "");
+        } catch {
+          return "";
+        }
+      }
+
+      function faviconUrl(value) {
+        const domain = siteDomain(value);
+        return domain ? `https://www.google.com/s2/favicons?domain=${encodeURIComponent(domain)}&sz=64` : "";
+      }
+
+      function titleCase(value) {
+        return String(value || "")
+          .replace(/[-_]+/g, " ")
+          .replace(/\s+/g, " ")
+          .trim()
+          .replace(/\b\w/g, char => char.toUpperCase());
+      }
+
+      function inferSiteName(value) {
+        const domain = siteDomain(value);
+        if (!domain) return "Site";
+        if (SITE_NAME_OVERRIDES[domain]) return SITE_NAME_OVERRIDES[domain];
+        const parts = domain.split(".");
+        const base = parts.length > 2 ? parts[parts.length - 2] : parts[0];
+        return titleCase(base);
+      }
+
+      function normalizeFavorite(favorite) {
+        try {
+          const url = normalizeSiteUrl(favorite.url);
+          const name = String(favorite.name || "").trim() || inferSiteName(url);
+          const category = String(favorite.category || "").trim() || "geral";
+          return {
+            id: favorite.id || uid(),
+            name,
+            url,
+            category,
+            favicon: faviconUrl(url),
+            createdAt: favorite.createdAt || new Date().toISOString()
+          };
+        } catch {
+          return null;
+        }
+      }
+
       function loadState() {
         let parsed = null;
         try {
@@ -1678,7 +2262,8 @@ const defaultState = {
           ...structuredClone(defaultState),
           ...parsed,
           settings: { ...defaultSettings, ...(parsed.settings || {}) },
-          tasks: parsed.tasks.map(normalizeTask)
+          tasks: parsed.tasks.map(normalizeTask),
+          favorites: Array.isArray(parsed.favorites) ? parsed.favorites.map(normalizeFavorite).filter(Boolean) : []
         };
       }
 
@@ -1812,6 +2397,7 @@ const defaultState = {
         els.progressText.textContent = `${percent}%`;
         els.progressRing.style.setProperty("--p", `${percent * 3.6}deg`);
         els.searchEngine.value = state.searchEngine || "google";
+        renderFavorites();
 
         if (!state.tasks.length) {
           els.taskList.innerHTML = `
@@ -1961,6 +2547,174 @@ const defaultState = {
         }[char]));
       }
 
+
+      function renderFavorites() {
+        const favorites = Array.isArray(state.favorites) ? state.favorites : [];
+        if (!favorites.length) {
+          els.favoriteList.innerHTML = `
+            <div class="favorite-empty">
+              Nenhum favorito ainda. Use <strong>+ Favorito</strong> ou <strong>Explorar por categoria</strong> para montar sua barra rápida.
+            </div>`;
+          return;
+        }
+
+        els.favoriteList.innerHTML = favorites.map(favorite => `
+          <div class="favorite-item" data-id="${escapeHtml(favorite.id)}">
+            <a class="favorite-link" href="${escapeHtml(favorite.url)}" title="Abrir ${escapeHtml(favorite.name)}">
+              <img class="favorite-icon" src="${escapeHtml(favorite.favicon || faviconUrl(favorite.url))}" alt="" loading="lazy" />
+              <span>
+                <span class="favorite-name">${escapeHtml(favorite.name)}</span>
+                <span class="favorite-domain">${escapeHtml(siteDomain(favorite.url) || favorite.category)}</span>
+              </span>
+            </a>
+            <div class="favorite-tools" aria-label="Ações do favorito">
+              <button class="favorite-tool" type="button" data-action="edit-favorite" title="Editar favorito">✎</button>
+              <button class="favorite-tool" type="button" data-action="remove-favorite" title="Remover favorito">×</button>
+            </div>
+          </div>
+        `).join("");
+      }
+
+      function openFavoriteDialog(id = null, preset = {}) {
+        favoriteEditingId = id;
+        const favorite = id ? state.favorites.find(item => item.id === id) : null;
+        els.favoriteDialogTitle.textContent = favorite ? "Editar favorito" : "Adicionar favorito";
+        els.favoriteUrl.value = favorite?.url || preset.url || "";
+        els.favoriteName.value = favorite?.name || preset.name || "";
+        els.favoriteCategory.value = favorite?.category || preset.category || "";
+        updateFavoriteAutofill();
+        els.favoriteDialog.showModal();
+        setTimeout(() => els.favoriteUrl.focus(), 50);
+      }
+
+      function updateFavoriteAutofill() {
+        const raw = els.favoriteUrl.value.trim();
+        if (!raw) {
+          els.favoriteAutofillHint.textContent = "O favicon e o nome serão sugeridos automaticamente.";
+          els.favoriteName.placeholder = "Automático se ficar vazio";
+          return;
+        }
+        try {
+          const url = normalizeSiteUrl(raw);
+          const name = inferSiteName(url);
+          const domain = siteDomain(url);
+          els.favoriteAutofillHint.textContent = `Sugestão: ${name} · ${domain} · favicon automático`;
+          if (!els.favoriteName.value.trim()) els.favoriteName.placeholder = name;
+        } catch {
+          els.favoriteAutofillHint.textContent = "Digite uma URL válida, como github.com ou https://github.com.";
+        }
+      }
+
+      function saveFavoriteFromForm() {
+        const candidate = normalizeFavorite({
+          id: favoriteEditingId || undefined,
+          url: els.favoriteUrl.value,
+          name: els.favoriteName.value,
+          category: els.favoriteCategory.value,
+          createdAt: favoriteEditingId
+            ? state.favorites.find(item => item.id === favoriteEditingId)?.createdAt
+            : undefined
+        });
+        if (!candidate) {
+          notify("Não consegui reconhecer essa URL.");
+          return false;
+        }
+
+        state.favorites = Array.isArray(state.favorites) ? state.favorites : [];
+        const duplicate = state.favorites.find(item => item.id !== favoriteEditingId && normalizeSiteUrl(item.url) === candidate.url);
+        if (duplicate) {
+          notify("Esse site já está nos favoritos.");
+          return false;
+        }
+
+        if (favoriteEditingId) {
+          state.favorites = state.favorites.map(item => item.id === favoriteEditingId ? candidate : item);
+          notify("Favorito atualizado.");
+        } else {
+          state.favorites.push(candidate);
+          notify(`Favorito adicionado: ${candidate.name}`);
+        }
+        saveState();
+        renderFavorites();
+        return true;
+      }
+
+      function removeFavorite(id) {
+        const favorite = state.favorites.find(item => item.id === id);
+        state.favorites = state.favorites.filter(item => item.id !== id);
+        saveState();
+        renderFavorites();
+        if (favorite) notify(`Favorito removido: ${favorite.name}`);
+      }
+
+      function addCatalogSite(id) {
+        const site = SITE_CATALOG.find(item => item.id === id);
+        if (!site) return;
+        const favorite = normalizeFavorite(site);
+        if (!favorite) return;
+        state.favorites = Array.isArray(state.favorites) ? state.favorites : [];
+        if (state.favorites.some(item => normalizeSiteUrl(item.url) === favorite.url)) {
+          notify("Esse site já está nos favoritos.");
+          return;
+        }
+        state.favorites.push(favorite);
+        saveState();
+        renderFavorites();
+        renderSiteFinder();
+        notify(`Favorito adicionado: ${favorite.name}`);
+      }
+
+      function siteCategoryList() {
+        return ["todos", ...Array.from(new Set(SITE_CATALOG.map(site => site.category))).sort((a, b) => a.localeCompare(b, "pt-BR"))];
+      }
+
+      function renderSiteFinder() {
+        const query = normalizeText(els.siteFinderInput.value);
+        const categories = siteCategoryList();
+        els.siteCategoryChips.innerHTML = categories.map(category => `
+          <button class="category-chip ${category === activeSiteCategory ? "active" : ""}" type="button" data-category="${escapeHtml(category)}">
+            ${category === "todos" ? "Todos" : escapeHtml(titleCase(category))}
+          </button>
+        `).join("");
+
+        const matches = SITE_CATALOG.filter(site => {
+          const inCategory = activeSiteCategory === "todos" || site.category === activeSiteCategory;
+          if (!inCategory) return false;
+          if (!query) return true;
+          const haystack = normalizeText([site.name, site.url, site.category, ...(site.tags || [])].join(" "));
+          return haystack.includes(query);
+        });
+
+        els.siteFinderEmpty.classList.toggle("visible", matches.length === 0);
+        els.siteFinderList.innerHTML = matches.map(site => {
+          const alreadyAdded = state.favorites?.some(item => {
+            try { return normalizeSiteUrl(item.url) === normalizeSiteUrl(site.url); }
+            catch { return false; }
+          });
+          return `
+            <article class="site-row">
+              <img class="site-icon" src="${escapeHtml(faviconUrl(site.url))}" alt="" loading="lazy" />
+              <div>
+                <span class="site-name">${escapeHtml(site.name)}</span>
+                <span class="site-url">${escapeHtml(siteDomain(site.url))}</span>
+                <div class="site-tags">
+                  <span class="site-tag">${escapeHtml(site.category)}</span>
+                  ${(site.tags || []).slice(0, 3).map(tag => `<span class="site-tag">${escapeHtml(tag)}</span>`).join("")}
+                </div>
+              </div>
+              <button class="mini-button ${alreadyAdded ? "" : "accent"}" type="button" data-action="catalog-add" data-site="${escapeHtml(site.id)}" ${alreadyAdded ? "disabled" : ""}>
+                ${alreadyAdded ? "Adicionado" : "+ Add"}
+              </button>
+            </article>`;
+        }).join("");
+      }
+
+      function applyUiDensity() {
+        const density = state.settings.uiDensity || "medium";
+        document.body.classList.toggle("density-compact", density === "compact");
+        document.body.classList.toggle("density-comfortable", density === "comfortable");
+      }
+
       function alarmName(value) {
         return ({
           default: "padrão",
@@ -2090,7 +2844,7 @@ function themeList() {
 }
 
 function currentTheme() {
-  return THEME_PRESETS[state.settings.themePreset] || THEME_PRESETS.japanese;
+  return THEME_PRESETS[state.settings.themePreset] || THEME_PRESETS.dark_academic || THEME_PRESETS.japanese;
 }
 
 function themeDescriptionHtml(theme) {
@@ -2125,6 +2879,8 @@ function applyThemePalette() {
   root.style.setProperty("--red-deep", theme.palette.redDeep);
   root.style.setProperty("--moss", theme.palette.moss);
   root.style.setProperty("--gold", theme.palette.gold);
+  root.style.setProperty("--line", theme.darkPanels ? "rgba(238,245,255,.12)" : "rgba(34, 37, 32, 0.14)");
+  document.body.classList.toggle("theme-dark-ui", Boolean(theme.darkPanels));
   document.body.style.background = theme.bodyBg || "#0d1513";
   els.defaultScene.style.background = theme.sceneBackground || "";
   const sun = document.querySelector(".sun");
@@ -2161,7 +2917,7 @@ function setThemePreset(name, { fetchWallpaper = false, notifyUser = true } = {}
 function bindSettingsToInputs() {
         const s = state.settings;
         els.wallpaperUrl.value = s.wallpaperMode === "url" ? s.wallpaperUrl : "";
-        els.themePreset.value = s.themePreset || "japanese";
+        els.themePreset.value = THEME_PRESETS[s.themePreset] ? s.themePreset : "dark_academic";
         els.wallpaperProvider.value = s.wallpaperProvider;
         els.wallpaperRotate.value = s.wallpaperRotate;
         els.wallpaperTags.value = s.wallpaperTags;
@@ -2182,6 +2938,8 @@ function bindSettingsToInputs() {
         els.alarmVolume.value = s.alarmVolume;
         els.notificationsEnabled.checked = s.notificationsEnabled;
         els.panelOpacity.value = s.panelOpacity;
+        els.uiDensity.value = s.uiDensity || "medium";
+        applyUiDensity();
         updateSettingLabels();
         updateCredit();
         updateThemeDescription();
@@ -2302,6 +3060,8 @@ function bindSettingsToInputs() {
         s.alarmVolume = Number(els.alarmVolume.value);
         s.notificationsEnabled = els.notificationsEnabled.checked;
         s.panelOpacity = Number(els.panelOpacity.value);
+        s.uiDensity = els.uiDensity.value;
+        applyUiDensity();
         saveState();
         applyWallpaper();
         resetFx();
@@ -2872,7 +3632,7 @@ function bindSettingsToInputs() {
 
       function exportData() {
         const data = JSON.stringify({
-          version: 2,
+          version: 3,
           exportedAt: new Date().toISOString(),
           state
         }, null, 2);
@@ -2894,7 +3654,8 @@ function bindSettingsToInputs() {
             ...structuredClone(defaultState),
             ...imported,
             settings: { ...defaultSettings, ...(imported.settings || {}) },
-            tasks: imported.tasks.map(normalizeTask)
+            tasks: imported.tasks.map(normalizeTask),
+            favorites: Array.isArray(imported.favorites) ? imported.favorites.map(normalizeFavorite).filter(Boolean) : []
           };
           saveState();
           bindSettingsToInputs();
@@ -2909,6 +3670,52 @@ function bindSettingsToInputs() {
           notify("O arquivo de configurações é inválido.");
         }
       }
+
+
+      els.addFavorite.addEventListener("click", () => openFavoriteDialog());
+      els.openSiteFinder.addEventListener("click", () => {
+        renderSiteFinder();
+        els.siteFinderDialog.showModal();
+        setTimeout(() => els.siteFinderInput.focus(), 50);
+      });
+      els.closeSiteFinder.addEventListener("click", () => els.siteFinderDialog.close());
+      els.finderManualFavorite.addEventListener("click", () => {
+        els.siteFinderDialog.close();
+        openFavoriteDialog();
+      });
+      els.clearSiteFinder.addEventListener("click", () => {
+        els.siteFinderInput.value = "";
+        activeSiteCategory = "todos";
+        renderSiteFinder();
+        els.siteFinderInput.focus();
+      });
+      els.siteFinderInput.addEventListener("input", renderSiteFinder);
+      els.siteCategoryChips.addEventListener("click", event => {
+        const button = event.target.closest("[data-category]");
+        if (!button) return;
+        activeSiteCategory = button.dataset.category;
+        renderSiteFinder();
+      });
+      els.siteFinderList.addEventListener("click", event => {
+        const button = event.target.closest("[data-action='catalog-add']");
+        if (!button) return;
+        addCatalogSite(button.dataset.site);
+      });
+      els.favoriteUrl.addEventListener("input", updateFavoriteAutofill);
+      els.cancelFavorite.addEventListener("click", () => els.favoriteDialog.close());
+      els.favoriteForm.addEventListener("submit", event => {
+        event.preventDefault();
+        if (saveFavoriteFromForm()) els.favoriteDialog.close();
+      });
+      els.favoriteList.addEventListener("click", event => {
+        const button = event.target.closest("[data-action]");
+        if (!button) return;
+        event.preventDefault();
+        const row = event.target.closest("[data-id]");
+        if (!row) return;
+        if (button.dataset.action === "remove-favorite") removeFavorite(row.dataset.id);
+        if (button.dataset.action === "edit-favorite") openFavoriteDialog(row.dataset.id);
+      });
 
       els.searchForm.addEventListener("submit", event => {
         event.preventDefault();
@@ -3164,7 +3971,7 @@ function bindSettingsToInputs() {
         els.wallpaperZoom, els.wallpaperFocusX, els.wallpaperFocusY, els.adultRating,
         els.backgroundDim, els.backgroundBlur, els.animationType, els.animationIntensity,
         els.animationSpeed, els.alarmTone, els.alarmRepeats, els.alarmVolume,
-        els.notificationsEnabled, els.panelOpacity
+        els.notificationsEnabled, els.panelOpacity, els.uiDensity
       ].forEach(element => {
         element.addEventListener(element.type === "range" ? "input" : "change", saveVisualSettings);
       });
@@ -3229,6 +4036,7 @@ function bindSettingsToInputs() {
         cancelAnimationFrame(animationFrame);
         animationFrame = requestAnimationFrame(drawFx);
         render();
+        renderSiteFinder();
         configureAutoWallpaper();
         maybeFetchWallpaperAtStartup();
 
