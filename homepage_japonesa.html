@@ -790,15 +790,7 @@
 
     .theme-browser-empty.visible { display: block; }
 
-    .pomodoro-toggle-inline {
-      min-width: 132px;
-    }
-
-    body.pomodoro-hidden .side { display: none; }
-    body.pomodoro-hidden .grid {
-      grid-template-columns: minmax(0, 860px);
-      justify-content: center;
-    }
+    body.productivity-hidden #productivityArea { display: none; }
 
     .finder-web-panel {
       margin: 8px 0 14px;
@@ -811,8 +803,24 @@
     .finder-web-panel strong { display: block; margin-bottom: 4px; }
     .finder-web-panel small { color: rgba(23,25,22,.58); line-height: 1.45; }
 
+    .finder-status {
+      min-height: 18px;
+      margin-top: 8px;
+      color: rgba(23,25,22,.62);
+      font-size: .74rem;
+      line-height: 1.45;
+    }
+
+    .finder-status.loading { color: var(--red-deep); }
+    .finder-status.error { color: #8b2f2b; }
+
     .finder-tools.extended {
-      grid-template-columns: minmax(0, 1fr) 145px auto auto;
+      grid-template-columns: minmax(0, 1fr) 185px auto auto;
+    }
+
+    .site-row.feed-result-row {
+      background: rgba(195,154,90,.12);
+      border-color: rgba(195,154,90,.24);
     }
 
     .site-row.web-search-row {
@@ -833,8 +841,14 @@
 
     body.theme-dark-ui .theme-card-desc,
     body.theme-dark-ui .theme-browser-empty,
-    body.theme-dark-ui .finder-web-panel small {
+    body.theme-dark-ui .finder-web-panel small,
+    body.theme-dark-ui .finder-status {
       color: rgba(232,238,242,.62);
+    }
+
+    body.theme-dark-ui .site-row.feed-result-row {
+      background: rgba(230,199,129,.10);
+      border-color: rgba(230,199,129,.22);
     }
 
     body.theme-dark-ui .theme-card-symbol {
@@ -1704,13 +1718,12 @@
         <div class="favorite-actions">
           <button class="mini-button accent" id="addFavorite" type="button">+ Favorito</button>
           <button class="mini-button" id="openSiteFinder" type="button">Explorar sites</button>
-          <button class="mini-button pomodoro-toggle-inline" id="togglePomodoro" type="button">Ocultar Pomodoro</button>
         </div>
       </div>
       <div class="favorites-list" id="favoriteList"></div>
     </section>
 
-    <section class="grid">
+    <section class="grid" id="productivityArea">
       <article class="card">
         <div class="card-header">
           <div>
@@ -1835,20 +1848,22 @@
       </div>
 
       <div class="finder-tools extended">
-        <input class="field" id="siteFinderInput" placeholder="Pesquise categoria, nome, assunto ou domínio: tecnologia, jogos, linux, github.com..." autocomplete="off" />
-        <select class="field" id="siteWebSearchEngine" aria-label="Buscar novos sites usando">
-          <option value="google">Google</option>
-          <option value="duck">DuckDuckGo</option>
-          <option value="brave">Brave Search</option>
-          <option value="reddit">Reddit</option>
+        <input class="field" id="siteFinderInput" placeholder="Pesquise categoria, nome, assunto, domínio ou URL de RSS/Atom: tecnologia, jogos, linux, github.com..." autocomplete="off" />
+        <select class="field" id="siteWebSearchEngine" aria-label="Fonte de busca interna">
+          <option value="googleNews">Google Notícias RSS</option>
+          <option value="bingNews">Bing Notícias RSS</option>
+          <option value="redditRss">Reddit RSS</option>
+          <option value="hackerNews">Hacker News RSS</option>
+          <option value="customFeed">RSS/Atom digitado</option>
         </select>
-        <button class="mini-button accent" type="button" id="searchNewSites">Buscar novos</button>
+        <button class="mini-button accent" type="button" id="searchNewSites">Buscar feeds</button>
         <button class="mini-button" type="button" id="clearSiteFinder">Limpar</button>
       </div>
 
       <div class="finder-web-panel">
-        <strong>Catálogo + busca externa</strong>
-        <small>O catálogo aparece aqui dentro. Para descobrir sites que ainda não estão na lista, pesquise um termo e use “Buscar novos”; quando encontrar um domínio, cole no botão “Inserir manualmente” ou digite o domínio direto na busca para criar um favorito.</small>
+        <strong>Catálogo + busca interna por feeds</strong>
+        <small>A busca acontece dentro desta janela. Ela consulta RSS/Atom públicos, extrai os sites encontrados e permite favoritar sem sair da página. Alguns feeds podem falhar por bloqueio de CORS; a página tenta alternativas automaticamente.</small>
+        <div class="finder-status" id="siteFinderStatus"></div>
       </div>
 
       <div class="category-chips" id="siteCategoryChips" aria-label="Categorias de sites"></div>
@@ -2157,6 +2172,13 @@
       <section class="settings-section">
         <h3>Aparência da interface</h3>
         <p class="help">Controle o tamanho geral e deixe os painéis realmente transparentes quando quiser ver o wallpaper com nitidez.</p>
+        <div class="switch-row" style="margin-top:0; margin-bottom:14px">
+          <span>Mostrar bloco de produtividade — checklist diária + Pomodoro</span>
+          <label class="switch">
+            <input id="toggleProductivity" type="checkbox" checked />
+            <span class="slider-switch"></span>
+          </label>
+        </div>
         <div class="setting-grid">
           <div class="setting">
             <label for="uiDensity">Tamanho</label>
@@ -2237,6 +2259,7 @@
         panelOpacity: 88,
         panelBlur: 6,
         uiDensity: "medium",
+        productivityVisible: true,
         pomodoroVisible: true,
         lastWallpaperFetch: "",
         lastWallpaperDay: ""
@@ -2346,11 +2369,27 @@ const THEME_PRESETS = {
         escuros: { label: "Bons no dark", keywords: ["dark_academic", "hacker", "lain", "moonlit_study", "rainy_noir", "retro_terminal", "occult_library", "neon_tokyo", "lofi_night"] }
       };
 
-      const ONLINE_SEARCH_ENGINES = {
-        google: query => `https://www.google.com/search?q=${encodeURIComponent(query)}`,
-        duck: query => `https://duckduckgo.com/?q=${encodeURIComponent(query)}`,
-        brave: query => `https://search.brave.com/search?q=${encodeURIComponent(query)}`,
-        reddit: query => `https://www.google.com/search?q=${encodeURIComponent(`${query} site:reddit.com`)}`
+      const FEED_SEARCH_SOURCES = {
+        googleNews: {
+          label: "Google Notícias RSS",
+          build: query => `https://news.google.com/rss/search?q=${encodeURIComponent(query)}&hl=pt-BR&gl=BR&ceid=BR:pt-419`
+        },
+        bingNews: {
+          label: "Bing Notícias RSS",
+          build: query => `https://www.bing.com/news/search?q=${encodeURIComponent(query)}&format=rss`
+        },
+        redditRss: {
+          label: "Reddit RSS",
+          build: query => `https://www.reddit.com/search.rss?q=${encodeURIComponent(query)}&sort=relevance&t=all`
+        },
+        hackerNews: {
+          label: "Hacker News RSS",
+          build: query => `https://hnrss.org/newest?q=${encodeURIComponent(query)}`
+        },
+        customFeed: {
+          label: "RSS/Atom digitado",
+          build: query => normalizeSiteUrl(query)
+        }
       };
 
 const defaultState = {
@@ -2366,9 +2405,9 @@ const defaultState = {
       };
 
       const els = Object.fromEntries([
-        "clockTime","clockDate","searchForm","searchInput","searchEngine","favoriteList","addFavorite","openSiteFinder","togglePomodoro","pomodoroPanel",
+        "clockTime","clockDate","searchForm","searchInput","searchEngine","favoriteList","addFavorite","openSiteFinder","productivityArea",
         "favoriteDialog","favoriteForm","favoriteDialogTitle","favoriteUrl","favoriteName","favoriteCategory","favoriteAutofillHint","cancelFavorite",
-        "siteFinderDialog","closeSiteFinder","finderManualFavorite","siteFinderInput","siteWebSearchEngine","searchNewSites","clearSiteFinder","siteCategoryChips","siteFinderList","siteFinderEmpty",
+        "siteFinderDialog","closeSiteFinder","finderManualFavorite","siteFinderInput","siteWebSearchEngine","searchNewSites","clearSiteFinder","siteCategoryChips","siteFinderList","siteFinderEmpty","siteFinderStatus",
         "taskForm","taskTitle","taskMinutes","taskRepeat","taskList","progressRing","progressText","clearDone","resetDay",
         "focusName","timerTime","enso","toggleTimer","resetTimer","durationInput","activeAlarmLabel",
         "editDialog","editForm","editTitle","editMinutes","editAlarm","editRepeat","cancelEdit","toast",
@@ -2381,7 +2420,7 @@ const defaultState = {
         "backgroundBlur","backgroundBlurValue",
         "wallpaperStatus","wallpaperCredit","animationType","animationIntensity","animationSpeed",
         "animationSpeedValue","alarmTone","alarmRepeats","alarmVolume","alarmVolumeValue","alarmFile",
-        "testAlarm","alarmFileStatus","notificationsEnabled","panelOpacity","panelOpacityValue","panelBlur","panelBlurValue","uiDensity",
+        "testAlarm","alarmFileStatus","notificationsEnabled","panelOpacity","panelOpacityValue","panelBlur","panelBlurValue","uiDensity","toggleProductivity",
         "exportSettings","importSettings","resetEverything"
       ].map(id => [id, document.getElementById(id)]));
 
@@ -2389,6 +2428,8 @@ const defaultState = {
       let editingId = null;
       let favoriteEditingId = null;
       let activeSiteCategory = "todos";
+      let feedSearchResults = [];
+      let lastFeedSearchKey = "";
       let audioContext = null;
       let autoWallpaperTimer = null;
       let customWallpaperObjectUrl = "";
@@ -2493,10 +2534,15 @@ const defaultState = {
 
         if (!parsed || !Array.isArray(parsed.tasks)) return structuredClone(defaultState);
 
+        const mergedSettings = { ...defaultSettings, ...(parsed.settings || {}) };
+        if (!("productivityVisible" in (parsed.settings || {})) && "pomodoroVisible" in (parsed.settings || {})) {
+          mergedSettings.productivityVisible = parsed.settings.pomodoroVisible;
+        }
+
         return {
           ...structuredClone(defaultState),
           ...parsed,
-          settings: { ...defaultSettings, ...(parsed.settings || {}) },
+          settings: mergedSettings,
           tasks: parsed.tasks.map(normalizeTask),
           favorites: Array.isArray(parsed.favorites) ? parsed.favorites.map(normalizeFavorite).filter(Boolean) : []
         };
@@ -2882,9 +2928,7 @@ const defaultState = {
         if (favorite) notify(`Favorito removido: ${favorite.name}`);
       }
 
-      function addCatalogSite(id) {
-        const site = SITE_CATALOG.find(item => item.id === id);
-        if (!site) return;
+      function addDiscoveredFavorite(site) {
         const favorite = normalizeFavorite(site);
         if (!favorite) return;
         state.favorites = Array.isArray(state.favorites) ? state.favorites : [];
@@ -2899,21 +2943,125 @@ const defaultState = {
         notify(`Favorito adicionado: ${favorite.name}`);
       }
 
+      function addCatalogSite(id) {
+        const site = SITE_CATALOG.find(item => item.id === id);
+        if (!site) return;
+        addDiscoveredFavorite(site);
+      }
+
+      function addFeedSite(index) {
+        const site = feedSearchResults[Number(index)];
+        if (!site) return;
+        addDiscoveredFavorite(site);
+      }
+
       function siteCategoryList() {
         return ["todos", ...Array.from(new Set(SITE_CATALOG.map(site => site.category))).sort((a, b) => a.localeCompare(b, "pt-BR"))];
       }
 
-      function externalSiteSearchQuery() {
+      function feedSearchQuery() {
         const raw = els.siteFinderInput.value.trim();
+        if ((els.siteWebSearchEngine?.value || "") === "customFeed") return raw;
         const category = activeSiteCategory !== "todos" ? activeSiteCategory : "";
-        const term = raw || category || "sites úteis para estudo";
-        return `melhores sites ${term}`.trim();
+        return (raw || category || "tecnologia programação estudos").trim();
       }
 
-      function openExternalSiteSearch(query = externalSiteSearchQuery()) {
-        const engine = els.siteWebSearchEngine?.value || "google";
-        const urlBuilder = ONLINE_SEARCH_ENGINES[engine] || ONLINE_SEARCH_ENGINES.google;
-        window.open(urlBuilder(query), "_blank", "noopener,noreferrer");
+      function setSiteFinderStatus(message = "", tone = "") {
+        if (!els.siteFinderStatus) return;
+        els.siteFinderStatus.textContent = message;
+        els.siteFinderStatus.classList.toggle("loading", tone === "loading");
+        els.siteFinderStatus.classList.toggle("error", tone === "error");
+      }
+
+      async function fetchTextWithCorsFallback(url) {
+        const attempts = [
+          url,
+          `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+          `https://corsproxy.io/?${encodeURIComponent(url)}`
+        ];
+        let lastError = null;
+        for (const attempt of attempts) {
+          try {
+            const response = await fetch(attempt, { headers: { Accept: "application/rss+xml, application/atom+xml, application/xml, text/xml, text/plain, */*" } });
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            const text = await response.text();
+            if (text && text.trim()) return text;
+          } catch (error) {
+            lastError = error;
+          }
+        }
+        throw lastError || new Error("Não foi possível ler o feed.");
+      }
+
+      function nodeText(node, selector) {
+        const found = node.querySelector(selector);
+        return found ? found.textContent.trim() : "";
+      }
+
+      function extractFeedLink(item) {
+        const source = item.querySelector("source[url]");
+        if (source?.getAttribute("url")) return source.getAttribute("url");
+        const atomLink = item.querySelector("link[href]");
+        if (atomLink?.getAttribute("href")) return atomLink.getAttribute("href");
+        return nodeText(item, "link") || nodeText(item, "guid") || "";
+      }
+
+      function parseFeedSites(xmlText, sourceLabel) {
+        const doc = new DOMParser().parseFromString(xmlText, "application/xml");
+        if (doc.querySelector("parsererror")) throw new Error("O retorno não parece ser RSS/Atom válido.");
+        const items = Array.from(doc.querySelectorAll("item, entry"));
+        const blockedDomains = /(^|\.)(google|bing|microsoft|redditstatic)\./i;
+        const seen = new Set();
+        return items.map(item => {
+          const source = item.querySelector("source[url]");
+          const rawLink = extractFeedLink(item);
+          let url = "";
+          try { url = normalizeSiteUrl(rawLink); } catch { return null; }
+          const domain = siteDomain(url);
+          if (!domain || blockedDomains.test(domain)) return null;
+          if (seen.has(domain)) return null;
+          seen.add(domain);
+          const sourceName = source?.textContent?.trim();
+          const title = nodeText(item, "title");
+          return normalizeFavorite({
+            url,
+            name: sourceName || inferSiteName(url),
+            category: activeSiteCategory !== "todos" ? activeSiteCategory : "descoberto",
+            createdAt: new Date().toISOString(),
+            feedTitle: title,
+            sourceLabel
+          });
+        }).filter(Boolean).slice(0, 24);
+      }
+
+      async function searchSitesInsidePage() {
+        const sourceKey = els.siteWebSearchEngine?.value || "googleNews";
+        const source = FEED_SEARCH_SOURCES[sourceKey] || FEED_SEARCH_SOURCES.googleNews;
+        const query = feedSearchQuery();
+        if (!query) return notify("Digite um termo de busca ou uma URL de RSS/Atom.");
+        if (sourceKey === "customFeed" && !queryLooksLikeDomain(query)) return notify("Para RSS/Atom digitado, informe uma URL de feed válida.");
+
+        els.searchNewSites.disabled = true;
+        setSiteFinderStatus(`Buscando dentro da página via ${source.label}...`, "loading");
+        try {
+          const feedUrl = source.build(query);
+          const xmlText = await fetchTextWithCorsFallback(feedUrl);
+          feedSearchResults = parseFeedSites(xmlText, source.label);
+          lastFeedSearchKey = `${sourceKey}:${query}`;
+          renderSiteFinder();
+          if (feedSearchResults.length) {
+            setSiteFinderStatus(`${feedSearchResults.length} site(s) encontrados via ${source.label}.`, "");
+          } else {
+            setSiteFinderStatus("Nenhum site novo foi extraído desse feed. Tente outra fonte ou termo.", "error");
+          }
+        } catch (error) {
+          console.warn("Erro na busca por feed:", error);
+          feedSearchResults = [];
+          renderSiteFinder();
+          setSiteFinderStatus("Não consegui ler esse feed no navegador. Tente outra fonte, outra palavra ou cole uma URL RSS/Atom direta.", "error");
+        } finally {
+          els.searchNewSites.disabled = false;
+        }
       }
 
       function queryLooksLikeDomain(raw) {
@@ -2945,7 +3093,30 @@ const defaultState = {
           return haystack.includes(query);
         });
 
-        const rows = matches.map(site => {
+        const rows = [];
+
+        if (feedSearchResults.length) {
+          feedSearchResults.forEach((site, index) => {
+            const alreadyAdded = state.favorites?.some(item => {
+              try { return normalizeSiteUrl(item.url) === normalizeSiteUrl(site.url); }
+              catch { return false; }
+            });
+            rows.push(`
+              <article class="site-row feed-result-row">
+                <img class="site-icon" src="${escapeHtml(faviconUrl(site.url))}" alt="" loading="lazy" />
+                <div>
+                  <span class="site-name">${escapeHtml(site.name)}</span>
+                  <span class="site-url">${escapeHtml(siteDomain(site.url))}</span>
+                  <div class="site-tags"><span class="site-tag">feed</span><span class="site-tag">${escapeHtml(site.category || "descoberto")}</span></div>
+                </div>
+                <button class="mini-button ${alreadyAdded ? "" : "accent"}" type="button" data-action="feed-add" data-feed-index="${index}" ${alreadyAdded ? "disabled" : ""}>
+                  ${alreadyAdded ? "Adicionado" : "+ Add"}
+                </button>
+              </article>`);
+          });
+        }
+
+        rows.push(...matches.map(site => {
           const alreadyAdded = state.favorites?.some(item => {
             try { return normalizeSiteUrl(item.url) === normalizeSiteUrl(site.url); }
             catch { return false; }
@@ -2965,20 +3136,7 @@ const defaultState = {
                 ${alreadyAdded ? "Adicionado" : "+ Add"}
               </button>
             </article>`;
-        });
-
-        if (rawQuery) {
-          rows.unshift(`
-            <article class="site-row web-search-row">
-              <div class="site-icon" aria-hidden="true">🔎</div>
-              <div>
-                <span class="site-name">Buscar novos sites sobre “${escapeHtml(rawQuery)}”</span>
-                <span class="site-url">Abre uma pesquisa externa; depois cole o domínio encontrado em “Inserir manualmente”.</span>
-                <div class="site-tags"><span class="site-tag">web</span><span class="site-tag">descoberta</span></div>
-              </div>
-              <button class="mini-button accent" type="button" data-action="online-search">Buscar</button>
-            </article>`);
-        }
+        }));
 
         if (queryLooksLikeDomain(rawQuery)) {
           let url = rawQuery;
@@ -3001,13 +3159,11 @@ const defaultState = {
 
       function applyUiDensity() {
         const density = state.settings.uiDensity || "medium";
+        const showProductivity = state.settings.productivityVisible !== false;
         document.body.classList.toggle("density-compact", density === "compact");
         document.body.classList.toggle("density-comfortable", density === "comfortable");
-        document.body.classList.toggle("pomodoro-hidden", state.settings.pomodoroVisible === false);
-        if (els.togglePomodoro) {
-          els.togglePomodoro.textContent = state.settings.pomodoroVisible === false ? "Mostrar Pomodoro" : "Ocultar Pomodoro";
-          els.togglePomodoro.setAttribute("aria-pressed", String(state.settings.pomodoroVisible === false));
-        }
+        document.body.classList.toggle("productivity-hidden", !showProductivity);
+        if (els.toggleProductivity) els.toggleProductivity.checked = showProductivity;
       }
 
       function alarmName(value) {
@@ -4157,8 +4313,9 @@ function bindSettingsToInputs() {
       }
 
 
-      els.togglePomodoro.addEventListener("click", () => {
-        state.settings.pomodoroVisible = state.settings.pomodoroVisible === false;
+      els.toggleProductivity.addEventListener("change", () => {
+        state.settings.productivityVisible = els.toggleProductivity.checked;
+        state.settings.pomodoroVisible = els.toggleProductivity.checked;
         saveState();
         applyUiDensity();
       });
@@ -4174,15 +4331,32 @@ function bindSettingsToInputs() {
         els.siteFinderDialog.close();
         openFavoriteDialog();
       });
-      els.searchNewSites.addEventListener("click", () => openExternalSiteSearch());
+      els.searchNewSites.addEventListener("click", () => searchSitesInsidePage());
 
       els.clearSiteFinder.addEventListener("click", () => {
         els.siteFinderInput.value = "";
         activeSiteCategory = "todos";
+        feedSearchResults = [];
+        lastFeedSearchKey = "";
+        setSiteFinderStatus("");
         renderSiteFinder();
         els.siteFinderInput.focus();
       });
-      els.siteFinderInput.addEventListener("input", renderSiteFinder);
+      els.siteFinderInput.addEventListener("input", () => {
+        const nextKey = `${els.siteWebSearchEngine?.value || "googleNews"}:${feedSearchQuery()}`;
+        if (lastFeedSearchKey && nextKey !== lastFeedSearchKey) {
+          feedSearchResults = [];
+          lastFeedSearchKey = "";
+          setSiteFinderStatus("");
+        }
+        renderSiteFinder();
+      });
+      els.siteWebSearchEngine.addEventListener("change", () => {
+        feedSearchResults = [];
+        lastFeedSearchKey = "";
+        setSiteFinderStatus("");
+        renderSiteFinder();
+      });
       els.siteCategoryChips.addEventListener("click", event => {
         const button = event.target.closest("[data-category]");
         if (!button) return;
@@ -4194,7 +4368,7 @@ function bindSettingsToInputs() {
         if (!button) return;
         const action = button.dataset.action;
         if (action === "catalog-add") addCatalogSite(button.dataset.site);
-        if (action === "online-search") openExternalSiteSearch();
+        if (action === "feed-add") addFeedSite(button.dataset.feedIndex);
         if (action === "add-query-domain") addQueryDomainAsFavorite();
       });
       els.favoriteUrl.addEventListener("input", updateFavoriteAutofill);
